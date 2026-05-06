@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { EcommerceComponent } from './pages/dashboard/ecommerce/ecommerce.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FormElementsComponent } from './pages/forms/form-elements/form-elements.component';
@@ -19,103 +20,122 @@ import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { CalenderComponent } from './pages/calender/calender.component';
 
-// 👇 IMPORTA EL GUARD
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
 
-  // 🔁 REDIRECCIÓN INICIAL AL LOGIN
+  // Redirección inicial
   {
     path: '',
     redirectTo: 'signin',
     pathMatch: 'full'
   },
 
-  // 🔐 RUTAS PROTEGIDAS (DASHBOARD)
-  {
-    path: '',
-    component: AppLayoutComponent,
-    canActivate: [authGuard], // 👈 PROTECCIÓN
-    children: [
-      {
-        path: 'dashboard',
-        component: EcommerceComponent,
-        title: 'Dashboard'
-      },
-      {
-        path: 'calendar',
-        component: CalenderComponent
-      },
-      {
-        path: 'profile',
-        component: ProfileComponent
-      },
-      {
-        path: 'form-elements',
-        component: FormElementsComponent
-      },
-      {
-        path: 'basic-tables',
-        component: BasicTablesComponent
-      },
-      {
-        path: 'blank',
-        component: BlankComponent
-      },
-      {
-        path: 'invoice',
-        component: InvoicesComponent
-      },
-      {
-        path: 'line-chart',
-        component: LineChartComponent
-      },
-      {
-        path: 'bar-chart',
-        component: BarChartComponent
-      },
-      {
-        path: 'alerts',
-        component: AlertsComponent
-      },
-      {
-        path: 'avatars',
-        component: AvatarElementComponent
-      },
-      {
-        path: 'badge',
-        component: BadgesComponent
-      },
-      {
-        path: 'buttons',
-        component: ButtonsComponent
-      },
-      {
-        path: 'images',
-        component: ImagesComponent
-      },
-      {
-        path: 'videos',
-        component: VideosComponent
-      }
-    ]
-  },
-
-  // 🔑 LOGIN
+  // Login
   {
     path: 'signin',
     component: SignInComponent
   },
 
-  // 📝 REGISTRO
+  // Registro
   {
     path: 'signup',
     component: SignUpComponent
   },
 
-  // ❌ NOT FOUND
+  // Layout principal protegido
+  {
+    path: '',
+    component: AppLayoutComponent,
+    canActivate: [authGuard],
+
+    children: [
+
+      // Dashboard principal de servidores
+      {
+        path: 'dashboard',
+        component: EcommerceComponent,
+        title: 'Panel de Servidores'
+      },
+
+      // Otras páginas
+      {
+        path: 'calendar',
+        component: CalenderComponent
+      },
+
+      {
+        path: 'profile',
+        component: ProfileComponent
+      },
+
+      {
+        path: 'form-elements',
+        component: FormElementsComponent
+      },
+
+      {
+        path: 'basic-tables',
+        component: BasicTablesComponent
+      },
+
+      {
+        path: 'blank',
+        component: BlankComponent
+      },
+
+      {
+        path: 'invoice',
+        component: InvoicesComponent
+      },
+
+      {
+        path: 'line-chart',
+        component: LineChartComponent
+      },
+
+      {
+        path: 'bar-chart',
+        component: BarChartComponent
+      },
+
+      {
+        path: 'alerts',
+        component: AlertsComponent
+      },
+
+      {
+        path: 'avatars',
+        component: AvatarElementComponent
+      },
+
+      {
+        path: 'badge',
+        component: BadgesComponent
+      },
+
+      {
+        path: 'buttons',
+        component: ButtonsComponent
+      },
+
+      {
+        path: 'images',
+        component: ImagesComponent
+      },
+
+      {
+        path: 'videos',
+        component: VideosComponent
+      }
+
+    ]
+  },
+
+  // Página no encontrada
   {
     path: '**',
     component: NotFoundComponent
   }
+
 ];

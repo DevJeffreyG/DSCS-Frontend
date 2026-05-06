@@ -1,21 +1,42 @@
 import { Component } from '@angular/core';
-import { EcommerceMetricsComponent } from '../../../shared/components/ecommerce/ecommerce-metrics/ecommerce-metrics.component';
-import { MonthlySalesChartComponent } from '../../../shared/components/ecommerce/monthly-sales-chart/monthly-sales-chart.component';
-import { MonthlyTargetComponent } from '../../../shared/components/ecommerce/monthly-target/monthly-target.component';
-import { StatisticsChartComponent } from '../../../shared/components/ecommerce/statics-chart/statics-chart.component';
-import { DemographicCardComponent } from '../../../shared/components/ecommerce/demographic-card/demographic-card.component';
-import { RecentOrdersComponent } from '../../../shared/components/ecommerce/recent-orders/recent-orders.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-ecommerce',
-  imports: [
-    EcommerceMetricsComponent,
-    MonthlySalesChartComponent,
-    MonthlyTargetComponent,
-    StatisticsChartComponent,
-    DemographicCardComponent,
-    RecentOrdersComponent,
-  ],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './ecommerce.component.html',
 })
-export class EcommerceComponent {}
+export class EcommerceComponent {
+
+  servers = [
+    {
+      id: 1,
+      nombre: 'Servidor Principal',
+      ip: '192.168.1.10',
+      estado: 'Online',
+      cpu: 35,
+      ram: 62,
+      disco: 48
+    },
+    {
+      id: 2,
+      nombre: 'Base de Datos',
+      ip: '192.168.1.20',
+      estado: 'Online',
+      cpu: 75,
+      ram: 80,
+      disco: 65
+    },
+    {
+      id: 3,
+      nombre: 'Servidor Web',
+      ip: '192.168.1.30',
+      estado: 'Offline',
+      cpu: 0,
+      ram: 0,
+      disco: 20
+    }
+  ];
+
+}
