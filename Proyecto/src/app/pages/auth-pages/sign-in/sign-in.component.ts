@@ -1,0 +1,25 @@
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthPageLayoutComponent } from '../../../shared/layout/auth-page-layout/auth-page-layout.component';
+import { SigninFormComponent } from '../../../shared/components/auth/signin-form/signin-form.component';
+
+@Component({
+  selector: 'app-sign-in',
+  standalone: true,
+  imports: [
+    AuthPageLayoutComponent,
+    SigninFormComponent,
+  ],
+  templateUrl: './sign-in.component.html',
+})
+export class SignInComponent {
+
+  constructor(private router: Router) {}
+
+  login() {
+    // 🔐 login simple
+    localStorage.setItem('auth', 'true');
+    this.router.navigate(['/dashboard']);
+  }
+
+}
