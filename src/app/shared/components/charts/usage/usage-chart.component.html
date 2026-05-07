@@ -1,0 +1,27 @@
+<div class="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03] max-w-xs mx-auto">
+  <div class="px-5 pt-5 bg-white shadow-default rounded-2xl pb-11 dark:bg-gray-900 sm:px-6 sm:pt-6">
+    <div class="flex justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
+          Uso de {{name}}
+        </h3>
+      </div>
+    </div>
+    <div class="relative">
+      <div class="max-h-[330px] max-w-[220px] mx-auto" id="chartDarkStyle">
+        <apx-chart
+          [series]="usageNumber"
+          [chart]="chart"
+          [plotOptions]="plotOptions"
+          [fill]="fill"
+          [stroke]="stroke"
+          [labels]="labels"
+          [colors]="colors"
+        ></apx-chart>
+      </div>
+    </div>
+    <p class="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
+      {{ message }}
+    </p>
+  </div>
+</div>

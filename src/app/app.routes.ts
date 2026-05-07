@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { EcommerceComponent } from './pages/dashboard/ecommerce/ecommerce.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FormElementsComponent } from './pages/forms/form-elements/form-elements.component';
 import { BasicTablesComponent } from './pages/tables/basic-tables/basic-tables.component';
@@ -21,6 +21,7 @@ import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { CalenderComponent } from './pages/calender/calender.component';
 
 import { authGuard } from './guards/auth.guard';
+import { MonitorComponent } from './pages/monitor/monitor.component';
 
 export const routes: Routes = [
 
@@ -54,11 +55,14 @@ export const routes: Routes = [
       // Dashboard principal de servidores
       {
         path: 'dashboard',
-        component: EcommerceComponent,
+        component: DashboardComponent,
         title: 'Panel de Servidores'
       },
-
-      // Otras páginas
+      {
+        path: 'monitor/:id',
+        component: MonitorComponent,
+        title: 'Monitor de Servidor'
+      },
       {
         path: 'calendar',
         component: CalenderComponent
