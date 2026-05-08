@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { UserCrudComponent } from '../../shared/components/user-crud/user-crud.component';
 import { ChangelogService } from '../../shared/services/changelog.service';
 import { ChangelogType } from '../../shared/enums/changelog-type';
+import { LoggeduserService } from '../../shared/services/loggeduser.service';
 
 @Component({
   selector: 'app-config',
@@ -99,6 +100,8 @@ export class ConfigComponent {
       ramThreshold: this.ramThreshold,
       monitoringInterval: this.monitoringInterval
     }).then(() => {
+      let user = LoggeduserService.getUser();
+      console.log(user);
       if (this.config.cpuThreshold != this.cpuThreshold) {
         this.changelogService.newChangelog({
           id: Date.now(),
@@ -107,7 +110,7 @@ export class ConfigComponent {
           old: { cpuThreshold: this.config.cpuThreshold },
           new: { cpuThreshold: this.cpuThreshold },
           fecha: new Date(),
-          id_usuario: 1 // TODO: Reemplazar con el ID del usuario autenticado
+          id_usuario: LoggeduserService.getUser().id_usuario
         });
       }
 
@@ -119,7 +122,7 @@ export class ConfigComponent {
           old: { ramThreshold: this.config.ramThreshold },
           new: { ramThreshold: this.ramThreshold },
           fecha: new Date(),
-          id_usuario: 1 // TODO: Reemplazar con el ID del usuario autenticado
+          id_usuario: LoggeduserService.getUser().id_usuario
         });
       }
 
@@ -131,7 +134,7 @@ export class ConfigComponent {
           old: { monitoringInterval: this.config.monitoringInterval },
           new: { monitoringInterval: this.monitoringInterval },
           fecha: new Date(),
-          id_usuario: 1 // TODO: Reemplazar con el ID del usuario autenticado
+          id_usuario: LoggeduserService.getUser().id_usuario
         });
       }
 

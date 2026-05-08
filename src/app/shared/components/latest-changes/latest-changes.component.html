@@ -7,7 +7,7 @@
         <ul *ngIf="changelogs.length > 0" class="space-y-4">
             <li *ngFor="let changelog of changelogs" class="p-4 bg-white rounded-lg shadow">
                 <p class="text-sm text-gray-600 mb-1">{{ changelog.fecha | date:'long' }}</p>
-                <p class="text-base text-gray-800">{{ changelog.descripcion }}</p>
+                <p class="text-base text-gray-800">[{{ executor(changelog) }}] {{ changelog.descripcion }}</p>
                 @if (changelog.old && changelog.new) {
                     <p class="text-sm text-gray-500 mt-2">{{ changelog.old | json }} ➡️ {{ changelog.new | json }}</p>
                 }

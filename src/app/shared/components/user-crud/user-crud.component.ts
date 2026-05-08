@@ -11,6 +11,7 @@ import { Option, SelectComponent } from '../form/select/select.component';
 import { UserRole } from '../../enums/user-role';
 import { ChangelogService } from '../../services/changelog.service';
 import { ChangelogType } from '../../enums/changelog-type';
+import { LoggeduserService } from '../../services/loggeduser.service';
 
 @Component({
   selector: 'app-user-crud',
@@ -82,7 +83,7 @@ export class UserCrudComponent {
         old: undefined,
         new: { nombre: this.userName, rol: this.userRole || UserRole.User },
         fecha: new Date(),
-        id_usuario: 1 // TODO: cambiarlo por el que esté loggeado
+        id_usuario: LoggeduserService.getUser().id_usuario
       })
     })
     .catch(error => {

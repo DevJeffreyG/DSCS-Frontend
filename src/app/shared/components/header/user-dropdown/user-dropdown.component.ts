@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { LoggeduserService } from '../../../services/loggeduser.service';
 
 @Component({
   selector: 'app-user-dropdown',
@@ -18,21 +19,18 @@ export class UserDropdownComponent implements OnInit {
   isOpen = false;
 
   // DATOS USUARIO
-  userName = 'Invitado';
-  userEmail = 'guest@example.com';
+  userName: string | null = null;
+  userEmail: string | null = null;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
 
-    const userData = localStorage.getItem('user');
+    const userData = LoggeduserService.getUser(); // Obtener datos del usuario loggeado desde el servicio
 
     if (userData) {
-
-      const user = JSON.parse(userData);
-
-      this.userName = user.nombre;
-      this.userEmail = user.correo;
+      this.userName = userData.nombre;
+      this.userEmail = userData.correo;
     }
   }
 
@@ -49,7 +47,6 @@ export class UserDropdownComponent implements OnInit {
     // LIMPIAR SESION
     localStorage.removeItem('auth');
     localStorage.removeItem('user');
-    localStorage.removeItem('role');
 
     // REDIRIGIR
     this.router.navigate(['/signin']);
