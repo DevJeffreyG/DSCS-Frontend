@@ -1,0 +1,99 @@
+@if (saveSuccess) {
+<app-alert [variant]="'success'" [title]="'Configuración guardada'" [message]="'La configuración se ha guardado exitosamente.'"/>
+}
+
+@if(saveError) {
+<app-alert [variant]="'error'" [title]="'Error al guardar la configuración'" [message]="'Ocurrió un error al guardar la configuración.'"/>
+}
+
+<div class="flex items-center justify-between mt-5 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">
+            Panel de Administración
+        </h1>
+    </div>
+</div>
+<div class="mb-6 grid grid-cols-12 gap-4 md:gap-6">
+    <div class="col-span-12 flex flex-row gap-4 overflow-x-auto w-full min-w-0 justify-between">
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200 min-w-xl">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                Configuración de Umbrales
+            </h2>
+            <p class="text-gray-500 mb-6">
+                Define los límites de uso para decisiones automáticas del core DSCS.
+            </p>
+            <div class="mb-4">
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-1">
+                        Umbral de CPU (%)
+                    </p>
+                    <div class="flex items-center gap-2">
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                [value]="cpuThreshold"
+                                (input)="onCpuInput($event)"
+                                [style.background]="rangeBackground(cpuThreshold)"
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            >
+                            <p class="text-sm text-gray-500 w-16 text-right">
+                                {{ cpuThreshold }}%
+                            </p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-1">
+                        Umbral de RAM (%)
+                    </p>
+                    <div class="flex items-center gap-2">
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                [value]="ramThreshold"
+                                (input)="onRamInput($event)"
+                                [style.background]="rangeBackground(ramThreshold)"
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            >
+                            <p class="text-sm text-gray-500 w-16 text-right">
+                                {{ ramThreshold }}%
+                            </p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-1">
+                        Intervalo de monitoreo (segundos)
+                    </p>
+                    <input
+                        type="number"
+                        name="monitoringInterval"
+                        id="monitoringInterval"
+                        [value]="monitoringInterval"
+                        (input)="onMonitoringIntervalInput($event)"
+                            class="w-1/4 p-2 border border-gray-300 rounded-md"
+                    >
+                </div>
+            </div>
+            <div>
+                <button type="button" (click)="saveConfiguration()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                    Guardar Configuración
+                </button>
+                <button type="button" (click)="cancelChanges()" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition ml-2">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200 min-w-xl">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                Historial de cambios
+            </h2>
+            <p class="text-gray-500 mb-6">
+                <app-latest-changes />
+            </p>
+        </div>
+    </div>
+</div>
+<div class="col-span-12">
+    <app-user-crud />
+</div>

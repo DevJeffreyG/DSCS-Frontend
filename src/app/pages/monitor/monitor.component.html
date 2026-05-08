@@ -21,7 +21,7 @@
         </div>
 
         <div class="col-span-12">
-            <app-last-events /> <!-- TODO: ESTOS SERAN LOS EVENTOS RECIENTES DE ESE SERVIDOR -->
+            <app-last-events [serverId]="server?.id ?? 0" />
         </div>
     </div>
 </div>

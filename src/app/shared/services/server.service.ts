@@ -1,10 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Server } from '../interfaces/server';
+import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
+import { AlertManagerService } from './alert-manager.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class ServerService implements OnDestroy {
+  constructor(
+    private alertManager: AlertManagerService
+  ) {}
   async getAllServers(): Promise<Server[]> {
     // TODO: API CALL
     return new Promise((resolve) => {
@@ -27,6 +33,95 @@ export class ServerService {
         resolve({ cpu: 0, ram: 0, disco: 0, red: 0 });
       }
     });
+  }
+
+  // ============= MÉTODOS DE ALERTAS =============
+
+  /**
+   * Obtener alertas activas de un servidor
+   */
+  getServerAlerts(serverId: number): Observable<ServerAlert[]> {
+    return this.alertManager.getServerAlerts(serverId);
+  }
+
+  /**
+   * Obtener alertas históricas desde el backend con filtros
+   */
+  getHistoricalAlerts(
+    serverId: number,
+    filters?: AlertFilter
+  ): Observable<ServerAlert[]> {
+    return this.alertManager.getHistoricalAlerts(serverId, filters);
+  }
+
+  /**
+   * Obtener alertas activas desde el backend
+   */
+  getActiveAlertsFromBackend(serverId: number): Observable<ServerAlert[]> {
+    return this.alertManager.getActiveAlertsFromBackend(serverId);
+  }
+
+  /**
+   * Obtener alertas filtradas por tipo, recurso, etc.
+   */
+  getFilteredAlerts(serverId: number, filters: AlertFilter): Observable<ServerAlert[]> {
+    return this.alertManager.getFilteredAlerts(serverId, filters);
+  }
+
+  /**
+   * Obtener estadísticas de alertas de un servidor
+   */
+  getAlertStats(serverId: number): Observable<AlertStats> {
+    return this.alertManager.getAlertStats(serverId);
+  }
+
+  /**
+   * Obtener todas las alertas críticas de todos los servidores
+   */
+  getAllCriticalAlerts(): Observable<ServerAlert[]> {
+    return this.alertManager.getAllCriticalAlerts();
+  }
+
+  /**
+   * Marcar una alerta como resuelta
+   */
+  resolveAlert(alertId: string): Observable<void> {
+    return this.alertManager.resolveAlert(alertId);
+  }
+
+  /**
+   * Suscribirse a alertas en tiempo real de un servidor
+   */
+  subscribeToServerAlerts(serverId: number): Observable<ServerAlert> {
+    return this.alertManager.subscribeToServer(serverId);
+  }
+
+  /**
+   * Desuscribirse de alertas de un servidor
+   */
+  unsubscribeFromServerAlerts(serverId: number): void {
+    this.alertManager.unsubscribeFromServer(serverId);
+  }
+
+  /**
+   * Limpiar alertas resueltas de un servidor
+   */
+  clearResolvedAlerts(serverId: number): void {
+    this.alertManager.clearResolvedAlerts(serverId);
+  }
+
+  /**
+   * Limpiar todas las alertas de un servidor
+   */
+  clearServerAlerts(serverId: number): void {
+    this.alertManager.clearAllAlerts(serverId);
+  }
+
+  /**
+   * Verificar si está conectado al WebSocket
+   */
+  isAlertListenerConnected$(): Observable<boolean> {
+    return this.alertManager.isConnected$();
   }
 
   private dummyServers: Server[] = [
@@ -61,4 +156,11 @@ export class ServerService {
       red: 0
     }
   ]
+
+  ngOnDestroy() {
+    // Desuscribirse de todos los servidores
+    this.dummyServers.forEach(server => {
+      this.unsubscribeFromServerAlerts(server.id);
+    });
+  }
 } 
