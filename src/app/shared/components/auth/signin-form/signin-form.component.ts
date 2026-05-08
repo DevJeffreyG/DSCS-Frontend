@@ -36,18 +36,15 @@ export class SigninFormComponent {
 
   onSignIn() {
 
-    // 🔐 VALIDACIÓN SIMPLE
-    if (this.email === 'admin@mail.com' && this.password === '1234') {
+    if (this.email === 'admin@mail.com' &&
+        this.password === '1234') {
 
-      // guardar sesión
       localStorage.setItem('auth', 'true');
 
-      // redirigir al dashboard
       this.router.navigate(['/dashboard']);
 
     } else {
       alert('Credenciales incorrectas');
     }
-
   }
 }

@@ -1,83 +1,98 @@
 <div class="w-full max-w-md pt-10 mx-auto">
+
   <a
     routerLink="/"
     class="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="size-5">
-      <path d="M12.7083 5L7.5 10.2083L12.7083 15.4167" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-    </svg>
-    Back to dashboard
+    ← Volver
   </a>
+
 </div>
 
 <div class="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+
   <div>
+
+    <!-- TITLE -->
     <div class="mb-5 sm:mb-8">
-      <h1 class="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-        Sign In
+
+      <h1
+        class="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white sm:text-title-md"
+      >
+        DSCS Login
       </h1>
+
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Enter your email and password to sign in!
+        Ingresa tus credenciales para acceder.
       </p>
+
     </div>
 
-    <!-- Form -->
+    <!-- FORM -->
     <form (ngSubmit)="onSignIn()" class="space-y-6">
 
       <!-- EMAIL -->
       <div>
-        <app-label>Email <span class="text-error-500">*</span></app-label>
+
+        <app-label>
+          Correo
+          <span class="text-error-500">*</span>
+        </app-label>
 
         <app-input-field
           type="email"
-          placeholder="info@gmail.com"
+          placeholder="admin@dscs.com"
           [(ngModel)]="email"
           name="email"
-          class="form-input"
           required
         />
+
       </div>
 
       <!-- PASSWORD -->
       <div>
-        <app-label>Password <span class="text-error-500">*</span></app-label>
+
+        <app-label>
+          Contraseña
+          <span class="text-error-500">*</span>
+        </app-label>
 
         <div class="relative">
+
           <app-input-field
             [type]="showPassword ? 'text' : 'password'"
-            placeholder="Enter your password"
+            placeholder="123456"
             [(ngModel)]="password"
             name="password"
-            class="form-input"
             required
           />
 
           <span
             (click)="togglePasswordVisibility()"
-            class="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+            class="absolute z-30 cursor-pointer right-4 top-1/2 -translate-y-1/2"
           >
-            @if (showPassword) {
-              👁️
-            } @else {
-              🙈
-            }
+            {{ showPassword ? '👁️' : '🙈' }}
           </span>
+
         </div>
+
       </div>
 
       <!-- CHECKBOX -->
       <div class="flex items-center justify-between">
+
         <app-checkbox
           [(checked)]="isChecked"
-          label="Keep me logged in"
+          label="Mantener sesión iniciada"
         />
 
         <a
           routerLink="/reset-password"
-          class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+          class="text-sm text-brand-500 hover:text-brand-600"
         >
-          Forgot password?
+          ¿Olvidaste tu contraseña?
         </a>
+
       </div>
 
       <!-- BUTTON -->
@@ -86,21 +101,29 @@
         size="sm"
         (btnClick)="onSignIn()"
       >
-        Sign in
+        Iniciar sesión
       </app-button>
+
     </form>
 
-    <!-- SIGN UP -->
+    <!-- REGISTER -->
     <div class="mt-5">
+
       <p class="text-sm text-center text-gray-700 dark:text-gray-400 sm:text-start">
-        Don't have an account?
+
+        ¿No tienes cuenta?
+
         <a
           routerLink="/signup"
-          class="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+          class="text-brand-500 hover:text-brand-600"
         >
-          Sign Up
+          Registrarse
         </a>
+
       </p>
+
     </div>
+
   </div>
+
 </div>
