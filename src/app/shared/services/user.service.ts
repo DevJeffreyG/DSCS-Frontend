@@ -6,22 +6,25 @@ import { UserRole } from '../enums/user-role';
   providedIn: 'root',
 })
 export class UserService {
+
   async getUsers(): Promise<User[]> {
-    // TODO: API CALL
-    return new Promise((resolve) => {
-      resolve(this.dummyUsers);
-    });
+    return this.dummyUsers;
   }
 
   async addUser(user: User): Promise<void> {
+    this.dummyUsers.push(user);
+  }
 
-    console.log('Adding user in service:', user);
-    
-    // TODO: API CALL
-    return new Promise((resolve) => {
-      this.dummyUsers.push(user);
-      resolve();
-    });
+  // LOGIN
+  async login(correo: string, contraseña: string): Promise<User | null> {
+
+    const user = this.dummyUsers.find(
+      u =>
+        u.correo === correo &&
+        u.contraseña === contraseña
+    );
+
+    return user || null;
   }
 
   private dummyUsers: User[] = [
