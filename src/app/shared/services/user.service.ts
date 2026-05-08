@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { User } from '../interfaces/user';
 import { UserRole } from '../enums/user-role';
+import { LoggeduserService } from './loggeduser.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-
   async getUsers(): Promise<User[]> {
     return this.dummyUsers;
   }
@@ -15,16 +15,38 @@ export class UserService {
     this.dummyUsers.push(user);
   }
 
+  async getUserById(id: number): Promise<User | undefined> {
+    return new Promise((resolve) => {
+      const user = this.dummyUsers.find(u => u.id_usuario === id);
+      resolve(user);
+    });
+  }
+
   // LOGIN
   async login(correo: string, contraseña: string): Promise<User | null> {
 
-    const user = this.dummyUsers.find(
-      u =>
-        u.correo === correo &&
-        u.contraseña === contraseña
-    );
+    // TODO: API CALL
+    return new Promise((resolve, reject) => {
+      const user = this.dummyUsers.find(
+        u =>
+          u.correo === correo &&
+          u.contraseña === contraseña
+      );
 
-    return user || null;
+      if(!user) {
+        reject(new Error('Correo o contraseña incorrectos'));
+        return;
+      }
+
+      LoggeduserService.setUser(user)
+
+      if (user) {
+        // guardar sesión
+        localStorage.setItem('auth', 'true');
+      }
+
+      resolve(user);
+    });
   }
 
   private dummyUsers: User[] = [

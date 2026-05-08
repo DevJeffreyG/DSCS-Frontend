@@ -9,6 +9,9 @@ import { ButtonComponent } from '../ui/button/button.component';
 import { ModalComponent } from '../ui/modal/modal.component';
 import { Option, SelectComponent } from '../form/select/select.component';
 import { UserRole } from '../../enums/user-role';
+import { ChangelogService } from '../../services/changelog.service';
+import { ChangelogType } from '../../enums/changelog-type';
+import { LoggeduserService } from '../../services/loggeduser.service';
 
 @Component({
   selector: 'app-user-crud',
@@ -42,7 +45,7 @@ export class UserCrudComponent {
   showPassword = false;
   public addUserIsOpen = false;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private changelogService: ChangelogService) { }
 
   async ngOnInit() {
     console.log(this.roleOptions, this.userRole)
@@ -73,6 +76,15 @@ export class UserCrudComponent {
     .then(async () => {
       // Refresh user list after adding new user
       this.users = await this.userService.getUsers();
+      this.changelogService.newChangelog({
+        id: Date.now(), // Temporary ID, replace with actual ID from backend
+        descripcion: `Se agregó un nuevo usuario "${this.userName}" con rol ${UserRole[this.userRole || UserRole.User]}`,
+        tipo: ChangelogType.NEW_USER,
+        old: undefined,
+        new: { nombre: this.userName, rol: this.userRole || UserRole.User },
+        fecha: new Date(),
+        id_usuario: LoggeduserService.getUser().id_usuario
+      })
     })
     .catch(error => {
       console.error('Error adding user:', error);

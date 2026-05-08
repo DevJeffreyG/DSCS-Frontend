@@ -51,38 +51,12 @@ export class SigninFormComponent {
     this.loading = true;
 
     try {
-
-      const user = await this.userService.login(
+       await this.userService.login(
         this.email,
         this.password
       );
 
-      if (user) {
-
-        // guardar sesión
-        localStorage.setItem('auth', 'true');
-
-        // guardar usuario completo
-        localStorage.setItem(
-          'user',
-          JSON.stringify(user)
-        );
-
-        // guardar rol
-        localStorage.setItem(
-          'role',
-          String(user.rol)
-        );
-
-        // redirección
-        this.router.navigate(['/dashboard']);
-
-      } else {
-
-        alert('Correo o contraseña incorrectos');
-
-      }
-
+      this.router.navigate(['/dashboard']);
     } catch (error) {
 
       console.error(error);
