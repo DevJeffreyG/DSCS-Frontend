@@ -22,6 +22,7 @@ import { CalenderComponent } from './pages/calender/calender.component';
 
 import { authGuard } from './guards/auth.guard';
 import { MonitorComponent } from './pages/monitor/monitor.component';
+import { ConfigComponent } from './pages/config/config.component';
 
 export const routes: Routes = [
 
@@ -62,6 +63,11 @@ export const routes: Routes = [
         path: 'monitor/:id',
         component: MonitorComponent,
         title: 'Monitor de Servidor'
+      },
+      {
+        path: 'config',
+        component: ConfigComponent,
+        title: 'Configuración'
       },
       {
         path: 'calendar',
