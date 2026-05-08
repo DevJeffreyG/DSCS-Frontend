@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { LabelComponent } from '../../form/label/label.component';
 import { CheckboxComponent } from '../../form/input/checkbox.component';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { InputFieldComponent } from '../../form/input/input-field.component';
+
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-signin-form',
   standalone: true,
+
   imports: [
     LabelComponent,
     CheckboxComponent,
@@ -18,8 +23,10 @@ import { FormsModule } from '@angular/forms';
     RouterModule,
     FormsModule
   ],
+
   templateUrl: './signin-form.component.html',
 })
+
 export class SigninFormComponent {
 
   showPassword = false;
@@ -28,23 +35,61 @@ export class SigninFormComponent {
   email = '';
   password = '';
 
-  constructor(private router: Router) {}
+  loading = false;
+
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {}
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
-  onSignIn() {
+  async onSignIn() {
 
-    if (this.email === 'admin@mail.com' &&
-        this.password === '1234') {
+    this.loading = true;
 
-      localStorage.setItem('auth', 'true');
+    try {
 
-      this.router.navigate(['/dashboard']);
+      const user = await this.userService.login(
+        this.email,
+        this.password
+      );
 
-    } else {
-      alert('Credenciales incorrectas');
+      if (user) {
+
+        // guardar sesión
+        localStorage.setItem('auth', 'true');
+
+        // guardar usuario completo
+        localStorage.setItem(
+          'user',
+          JSON.stringify(user)
+        );
+
+        // guardar rol
+        localStorage.setItem(
+          'role',
+          String(user.rol)
+        );
+
+        // redirección
+        this.router.navigate(['/dashboard']);
+
+      } else {
+
+        alert('Correo o contraseña incorrectos');
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+      alert('Error al iniciar sesión');
+
     }
+
+    this.loading = false;
   }
 }
