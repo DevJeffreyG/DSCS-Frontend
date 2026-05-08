@@ -1,9 +1,9 @@
 @if (saveSuccess) {
-<app-alert [variant]="'success'" [title]="'Configuración guardada'" [message]="'La configuración se ha guardado exitosamente.'"/>
+<app-alert [variant]="'success'" [title]="'Configuración guardada'" [message]="successMessage"/>
 }
 
 @if(saveError) {
-<app-alert [variant]="'error'" [title]="'Error al guardar la configuración'" [message]="'Ocurrió un error al guardar la configuración.'"/>
+<app-alert [variant]="'error'" [title]="'Error al guardar la configuración'" [message]="errorMessage"/>
 }
 
 <div class="flex items-center justify-between mt-5 mb-6">
@@ -88,7 +88,7 @@
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
                 Historial de cambios
             </h2>
-            <p class="text-gray-500 mb-6">
+            <p class="text-gray-500 mb-6 max-h-64 overflow-y-auto">
                 <app-latest-changes />
             </p>
         </div>
