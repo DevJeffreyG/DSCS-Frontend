@@ -1,105 +1,87 @@
 
-import { Component } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { BadgeComponent } from '../../ui/badge/badge.component';
+import { AlertManagerService } from '../../../services/alert-manager.service';
+import { ServerAlert } from '../../../interfaces/alert';
+import { Subject } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-last-events',
   imports: [
+    CommonModule,
     BadgeComponent
 ],
   templateUrl: './last-events.component.html',
   styles: ``
 })
-export class LastEventsComponent {
+export class LastEventsComponent implements OnInit, OnDestroy {
+    @Input() serverId: number = 1; // ID del servidor a monitorear
 
-    tableData = [
-      {
-        id: 1,
-        user: {
-          image: '/images/user/user-17.jpg',
-          name: 'Lindsey Curtis',
-          role: 'Web Designer',
-        },
-        projectName: 'Agency Website',
-        team: {
-          images: [
-            '/images/user/user-22.jpg',
-            '/images/user/user-23.jpg',
-            '/images/user/user-24.jpg',
-          ],
-        },
-        budget: '3.9K',
-        status: 'Active',
-      },
-      {
-        id: 2,
-        user: {
-          image: '/images/user/user-18.jpg',
-          name: 'Kaiya George',
-          role: 'Project Manager',
-        },
-        projectName: 'Technology',
-        team: {
-          images: ['/images/user/user-25.jpg', '/images/user/user-26.jpg'],
-        },
-        budget: '24.9K',
-        status: 'Pending',
-      },
-      {
-        id: 3,
-        user: {
-          image: '/images/user/user-17.jpg',
-          name: 'Zain Geidt',
-          role: 'Content Writing',
-        },
-        projectName: 'Blog Writing',
-        team: {
-          images: ['/images/user/user-27.jpg'],
-        },
-        budget: '12.7K',
-        status: 'Active',
-      },
-      {
-        id: 4,
-        user: {
-          image: '/images/user/user-20.jpg',
-          name: 'Abram Schleifer',
-          role: 'Digital Marketer',
-        },
-        projectName: 'Social Media',
-        team: {
-          images: [
-            '/images/user/user-28.jpg',
-            '/images/user/user-29.jpg',
-            '/images/user/user-30.jpg',
-          ],
-        },
-        budget: '2.8K',
-        status: 'Cancel',
-      },
-      {
-        id: 5,
-        user: {
-          image: '/images/user/user-21.jpg',
-          name: 'Carla George',
-          role: 'Front-end Developer',
-        },
-        projectName: 'Website',
-        team: {
-          images: [
-            '/images/user/user-31.jpg',
-            '/images/user/user-32.jpg',
-            '/images/user/user-33.jpg',
-          ],
-        },
-        budget: '4.5K',
-        status: 'Active',
-      },
-    ];
+    alerts: ServerAlert[] = [];
+    isLoading: boolean = true;
+    private destroy$ = new Subject<void>();
 
-  getBadgeColor(status: string): 'success' | 'warning' | 'error' {
-    if (status === 'Active') return 'success';
-    if (status === 'Pending') return 'warning';
-    return 'error';
+    constructor(private alertManager: AlertManagerService) {}
+
+    ngOnInit() {
+      console.log(`🔍 LastEventsComponent iniciado para servidor ${this.serverId}`);
+      
+      // Obtener alertas del servidor
+      this.alertManager.getServerAlerts(this.serverId)
+        .pipe(
+          tap((alerts) => {
+            console.log(`📊 Recibidas ${alerts.length} alertas para servidor ${this.serverId}`, alerts);
+            this.isLoading = false;
+          }),
+          takeUntil(this.destroy$)
+        )
+        .subscribe((alerts: ServerAlert[]) => {
+          // Mostrar solo las últimas 10 alertas, ordenadas por timestamp descendente
+          this.alerts = alerts
+            .sort((a: ServerAlert, b: ServerAlert) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, 10);
+          console.log(`✅ Mostrando ${this.alerts.length} alertas en la UI`);
+        });
+    }
+
+    ngOnDestroy() {
+      this.destroy$.next();
+      this.destroy$.complete();
+    }
+
+    getBadgeColor(tipo: string): 'success' | 'warning' | 'error' {
+    if (tipo === 'CRITICAL') return 'error';
+    if (tipo === 'WARNING') return 'warning';
+    return 'success'; // INFO
+  }
+
+  getRecursoColor(recurso: string): string {
+    const colors: { [key: string]: string } = {
+      'CPU': '#ff6b6b',
+      'RAM': '#4ecdc4',
+      'DISCO': '#ffa502',
+      'RED': '#6c5ce7',
+      'CONECTIVIDAD': '#00b894',
+      'GENERAL': '#95a5a6'
+    };
+    return colors[recurso] || '#95a5a6';
+  }
+
+  formatTimestamp(date: Date | string): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Hace unos segundos';
+    if (diffMins < 60) return `Hace ${diffMins}m`;
+    if (diffHours < 24) return `Hace ${diffHours}h`;
+    if (diffDays < 7) return `Hace ${diffDays}d`;
+    
+    return d.toLocaleDateString();
   }
 }
