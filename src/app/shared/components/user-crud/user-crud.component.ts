@@ -15,6 +15,7 @@ import { LoggeduserService } from '../../services/loggeduser.service';
 
 @Component({
   selector: 'app-user-crud',
+  standalone: true,
   imports: [
     CommonModule,
     TableDropdownComponent,
@@ -28,84 +29,323 @@ import { LoggeduserService } from '../../services/loggeduser.service';
   styleUrl: './user-crud.component.css',
 })
 export class UserCrudComponent {
+
+  // =====================================
+  // USERS
+  // =====================================
   users: User[] = [];
-  userRoles = UserRole; // Expose enum to template
 
+  // =====================================
+  // EDITING USER
+  // =====================================
+  editingUser: User | null = null;
+
+  // =====================================
+  // ENUM
+  // =====================================
+  userRoles = UserRole;
+
+  // =====================================
+  // FORM
+  // =====================================
   userName: string = '';
-  userEmail: string = '';
-  userPassword: string = '';
-  userRole: UserRole | null = null; // Default role for new users
 
+  userEmail: string = '';
+
+  userPassword: string = '';
+
+  userRole: UserRole | null = null;
+
+  // =====================================
+  // ROLE OPTIONS
+  // =====================================
   roleOptions: Option[] = [
-    { value: UserRole.Admin, label: 'Admin' },
-    { value: UserRole.Operator, label: 'Operator' },
-    { value: UserRole.User, label: 'User' }
+
+    {
+      value: UserRole.Admin,
+      label: 'Admin'
+    },
+
+    {
+      value: UserRole.Operator,
+      label: 'Operator'
+    },
+
+    {
+      value: UserRole.User,
+      label: 'User'
+    }
+
   ];
 
+  // =====================================
+  // UI
+  // =====================================
   showPassword = false;
-  public addUserIsOpen = false;
 
-  constructor(private userService: UserService, private changelogService: ChangelogService) { }
+  addUserIsOpen = false;
 
+  // =====================================
+  // CONSTRUCTOR
+  // =====================================
+  constructor(
+    private userService: UserService,
+    private changelogService: ChangelogService
+  ) {}
+
+  // =====================================
+  // INIT
+  // =====================================
   async ngOnInit() {
-    console.log(this.roleOptions, this.userRole)
-    // Fetch users from the service (replace with actual service call)
-    this.users = await this.userService.getUsers();
+
+    this.users =
+      await this.userService.getUsers();
+
   }
 
+  // =====================================
+  // GET ROLE
+  // =====================================
   getRole(role: number): string {
-    return UserRole[role as unknown as keyof typeof UserRole].toString() || 'Unknown';
+
+    return UserRole[
+      role as unknown as keyof typeof UserRole
+    ].toString();
+
   }
 
+  // =====================================
+  // OPEN MODAL
+  // =====================================
   addUserModal() {
+
+    // LIMPIAR
+    this.editingUser = null;
+
+    this.userName = '';
+
+    this.userEmail = '';
+
+    this.userPassword = '';
+
+    this.userRole = UserRole.User;
+
+    // OPEN
     this.addUserIsOpen = true;
+
   }
 
+  // =====================================
+  // CLOSE MODAL
+  // =====================================
   closeAddUser() {
+
     this.addUserIsOpen = false;
+
   }
 
-  handleAddUser() {
-    this.userService.addUser({
-      id_usuario: Date.now(), // Temporary ID, replace with actual ID from backend
-      nombre: this.userName,
-      correo: this.userEmail,
-      contraseña: this.userPassword,
-      rol: this.userRole || UserRole.User
-    })
-    .then(async () => {
-      // Refresh user list after adding new user
-      this.users = await this.userService.getUsers();
+  // =====================================
+  // HANDLE ROLE CHANGE
+  // =====================================
+  handleRoleChange(value: any) {
+
+    this.userRole = value;
+
+  }
+
+  // =====================================
+  // ADD / UPDATE USER
+  // =====================================
+  async handleAddUser() {
+
+    // =========================
+    // EDIT USER
+    // =========================
+    if (this.editingUser) {
+
+      const updatedUser: User = {
+
+        ...this.editingUser,
+
+        nombre: this.userName,
+
+        correo: this.userEmail,
+
+        contraseña: this.userPassword,
+
+        rol: this.userRole || UserRole.User
+
+      };
+
+      // UPDATE SERVICE
+      await this.userService.updateUser(
+        this.editingUser.id_usuario,
+        updatedUser
+      );
+
+      // REFRESH
+      this.users =
+        await this.userService.getUsers();
+
+      // CHANGELOG
       this.changelogService.newChangelog({
-        id: Date.now(), // Temporary ID, replace with actual ID from backend
-        descripcion: `Se agregó un nuevo usuario "${this.userName}" con rol ${UserRole[this.userRole || UserRole.User]}`,
-        tipo: ChangelogType.NEW_USER,
-        old: undefined,
-        new: { nombre: this.userName, rol: this.userRole || UserRole.User },
+
+        id: Date.now(),
+
+        descripcion:
+          `Se editó el usuario "${updatedUser.nombre}"`,
+
+        tipo:
+          ChangelogType.USER_ROLE_CHANGED,
+
+        old: this.editingUser,
+
+        new: updatedUser,
+
         fecha: new Date(),
-        id_usuario: LoggeduserService.getUser().id_usuario
-      })
-    })
-    .catch(error => {
-      console.error('Error adding user:', error);
+
+        id_usuario:
+          LoggeduserService.getUser().id_usuario
+
+      });
+
+      // RESET
+      this.editingUser = null;
+
+    }
+
+    // =========================
+    // NEW USER
+    // =========================
+    else {
+
+      const newUser: User = {
+
+        id_usuario: Date.now(),
+
+        nombre: this.userName,
+
+        correo: this.userEmail,
+
+        contraseña: this.userPassword,
+
+        rol: this.userRole || UserRole.User
+
+      };
+
+      // SAVE
+      await this.userService.addUser(
+        newUser
+      );
+
+      // REFRESH
+      this.users =
+        await this.userService.getUsers();
+
+      // CHANGELOG
+      this.changelogService.newChangelog({
+
+        id: Date.now(),
+
+        descripcion:
+          `Se agregó el usuario "${newUser.nombre}"`,
+
+        tipo:
+          ChangelogType.NEW_USER,
+
+        old: undefined,
+
+        new: newUser,
+
+        fecha: new Date(),
+
+        id_usuario:
+          LoggeduserService.getUser().id_usuario
+
+      });
+
+    }
+
+    // =====================================
+    // CLEAR FORM
+    // =====================================
+    this.userName = '';
+
+    this.userEmail = '';
+
+    this.userPassword = '';
+
+    this.userRole = UserRole.User;
+
+    // =====================================
+    // CLOSE
+    // =====================================
+    this.closeAddUser();
+
+  }
+
+  // =====================================
+  // EDIT USER
+  // =====================================
+  editUser(user: User) {
+
+    // SAVE USER
+    this.editingUser = { ...user };
+
+    // FILL FORM
+    this.userName =
+      user.nombre;
+
+    this.userEmail =
+      user.correo;
+
+    this.userPassword =
+      user.contraseña;
+
+    this.userRole =
+      user.rol;
+
+    // OPEN MODAL
+    this.addUserIsOpen = true;
+
+  }
+
+  // =====================================
+  // DELETE USER
+  // =====================================
+  async deleteUser(user: User) {
+
+    // DELETE
+    await this.userService.deleteUser(
+      user.id_usuario
+    );
+
+    // REFRESH
+    this.users =
+      await this.userService.getUsers();
+
+    // CHANGELOG
+    this.changelogService.newChangelog({
+
+      id: Date.now(),
+
+      descripcion:
+        `Se eliminó el usuario "${user.nombre}"`,
+
+      tipo:
+        ChangelogType.USER_REMOVED,
+
+      old: user,
+
+      new: undefined,
+
+      fecha: new Date(),
+
+      id_usuario:
+        LoggeduserService.getUser().id_usuario
+
     });
 
-    this.closeAddUser();
-  }
-
-  handleRoleChange(value: any) {
-    this.userRole = value;
-    console.log('Selected role:', this.userRole);
-  }
-
-  editUser(user: User) {
-    // Implement edit logic here
-    console.log('Edit user:', user);
-  }
-
-  deleteUser(user: User) {
-    // Implement delete logic here
-    console.log('Delete user:', user);
   }
 
 }
