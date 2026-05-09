@@ -8,6 +8,7 @@
       <!-- Table Header -->
       <thead class="border-b border-gray-100 dark:border-white/[0.05]">
         <tr>
+          <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Servidor</th>
           <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tipo</th>
           <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Recurso</th>
           <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Mensaje</th>
@@ -19,13 +20,17 @@
       <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
         @if (alerts.length === 0) {
           <tr>
-            <td colspan="5" class="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
-              <span class="text-theme-sm">No hay alertas en este servidor</span>
+            <td colspan="6" class="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+              <span class="text-theme-sm">No hay alertas</span>
             </td>
           </tr>
         } @else {
           @for (alert of alerts; track alert.id) {
             <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.05] transition">
+              <!-- Servidor -->
+              <td class="px-4 py-3 text-start text-theme-sm">
+                <span class="font-medium text-gray-700 dark:text-white/90">{{ serverMap[alert.serverId] || ('#' + alert.serverId) }}</span>
+              </td>
               <!-- Tipo de Alerta -->
               <td class="px-5 py-4 sm:px-6 text-start">
                 <app-badge [color]="getBadgeColor(alert.tipo)">

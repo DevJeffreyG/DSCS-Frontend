@@ -6,13 +6,15 @@ import { ServerService } from '../../shared/services/server.service';
 import { ServerAlert } from '../../shared/interfaces/alert';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { LastEventsComponent } from '../../shared/components/tables/last-events/last-events.component';
 
 @Component({
   selector: 'app-dashboard',
   imports: [
     ComponentCardComponent,
     CardNumberComponent,
-    CommonModule
+    CommonModule,
+    LastEventsComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
