@@ -35,7 +35,7 @@ function testAlertsHTTP() {
       const alerts = JSON.parse(data);
       console.log(`   ✅ Total de alertas: ${alerts.total}`);
       alerts.alerts.forEach((a) => {
-        console.log(`      - ID: ${a.id}, Servidor: ${a.serverId}, Tipo: ${a.tipo}, Resuelto: ${a.resuelto}`);
+        console.log(`      - ID: ${a.id}, Servidor: ${a.serverId}, Tipo: ${a.tipo}, Recurso: ${a.recurso}, Valor: ${a.valor ?? 'n/a'}, Umbral: ${a.umbral ?? 'n/a'}, Resuelto: ${a.resuelto}`);
       });
       console.log();
       testActiveAlertsFilter();
@@ -53,7 +53,7 @@ function testActiveAlertsFilter() {
       const alerts = JSON.parse(data);
       console.log(`   ✅ Alertas sin resolver: ${alerts.length}`);
       alerts.forEach((a) => {
-        console.log(`      - ID: ${a.id}, Tipo: ${a.tipo}, Resuelto: ${a.resuelto}`);
+        console.log(`      - ID: ${a.id}, Tipo: ${a.tipo}, Recurso: ${a.recurso}, Valor: ${a.valor ?? 'n/a'}, Umbral: ${a.umbral ?? 'n/a'}, Resuelto: ${a.resuelto}`);
       });
       console.log();
       testStats();
@@ -71,14 +71,49 @@ function testStats() {
       const stats = JSON.parse(data);
       console.log(`   ✅ Estadísticas:`, stats);
       console.log();
-      testWebSocket();
+      testResolveAlert();
     });
   });
 }
 
-// Prueba 5: WebSocket
+// Prueba 5: Resolver una alerta
+function testResolveAlert() {
+  console.log('5️⃣  Marcando la alerta 1 como resuelta...');
+
+  const payload = JSON.stringify({ resuelto: true, resueltoEn: new Date().toISOString() });
+  const request = http.request(
+    `${BACKEND_URL}/api/alerts/1`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    },
+    (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        const alert = JSON.parse(data);
+        console.log(`   ✅ Alerta actualizada: resuelto=${alert.resuelto}, resueltoEn=${alert.resueltoEn}`);
+        console.log();
+        testWebSocket();
+      });
+    }
+  );
+
+  request.on('error', (error) => {
+    console.log(`   ❌ Error al resolver la alerta: ${error.message}`);
+    process.exit(1);
+  });
+
+  request.write(payload);
+  request.end();
+}
+
+// Prueba 6: WebSocket
 function testWebSocket() {
-  console.log('5️⃣  Conectando por WebSocket...');
+  console.log('6️⃣  Conectando por WebSocket...');
   const socket = io(BACKEND_URL);
 
   socket.on('connect', () => {
@@ -98,7 +133,7 @@ function testWebSocket() {
 
     socket.on('alert', (alert) => {
       alertCount++;
-      console.log(`   🚨 ALERTA #${alertCount}: ${alert.tipo} - Servidor ${alert.serverId}`);
+      console.log(`   🚨 ALERTA #${alertCount}: ${alert.tipo} ${alert.recurso} - Servidor ${alert.serverId}`);
     });
 
     socket.on('disconnect', () => {

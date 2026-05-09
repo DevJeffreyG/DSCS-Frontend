@@ -17,38 +17,67 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
+const alertTypes = ['CRITICAL', 'WARNING', 'INFO'];
+const alertResources = ['CPU', 'RAM', 'DISCO', 'RED', 'CONECTIVIDAD', 'GENERAL'];
+
+function createAlert({
+  id,
+  serverId,
+  tipo,
+  recurso,
+  mensaje,
+  valor,
+  umbral,
+  timestamp = new Date(),
+  resuelto = false,
+  resueltoEn,
+}) {
+  return {
+    id,
+    serverId,
+    tipo,
+    recurso,
+    mensaje,
+    valor,
+    umbral,
+    timestamp,
+    resuelto,
+    resueltoEn,
+  };
+}
+
 // Base de datos simulada
 const alerts = [
-  {
+  createAlert({
     id: '1',
     serverId: 1,
-    tipo: 'CPU',
-    recurso: 'CPU Usage',
-    nivel: 'critical',
+    tipo: 'CRITICAL',
+    recurso: 'CPU',
     mensaje: 'CPU usage exceeds 90%',
+    valor: 94,
+    umbral: 90,
     timestamp: new Date(Date.now() - 5 * 60000), // 5 minutos atrás
-    resuelto: false,
-  },
-  {
+  }),
+  createAlert({
     id: '2',
     serverId: 1,
-    tipo: 'Memory',
-    recurso: 'Memory Usage',
-    nivel: 'warning',
+    tipo: 'WARNING',
+    recurso: 'RAM',
     mensaje: 'Memory usage exceeds 80%',
+    valor: 82,
+    umbral: 80,
     timestamp: new Date(Date.now() - 10 * 60000), // 10 minutos atrás
-    resuelto: false,
-  },
-  {
+  }),
+  createAlert({
     id: '3',
     serverId: 2,
-    tipo: 'Disk',
-    recurso: 'Disk Space',
-    nivel: 'critical',
+    tipo: 'CRITICAL',
+    recurso: 'DISCO',
     mensaje: 'Disk space critically low',
+    valor: 97,
+    umbral: 90,
     timestamp: new Date(Date.now() - 15 * 60000), // 15 minutos atrás
-    resuelto: false,
-  },
+  }),
 ];
 
 const serverSubscriptions = new Map();
@@ -137,10 +166,10 @@ app.get('/api/servers/:serverId/alerts/stats', (req, res) => {
 
   const stats = {
     total: serverAlerts.length,
+    criticas: serverAlerts.filter((a) => a.tipo === 'CRITICAL').length,
+    advertencias: serverAlerts.filter((a) => a.tipo === 'WARNING').length,
+    informativas: serverAlerts.filter((a) => a.tipo === 'INFO').length,
     resueltas: serverAlerts.filter((a) => a.resuelto).length,
-    sin_resolver: serverAlerts.filter((a) => !a.resuelto).length,
-    critical: serverAlerts.filter((a) => a.nivel === 'critical').length,
-    warning: serverAlerts.filter((a) => a.nivel === 'warning').length,
   };
 
   console.log(`📈 GET /api/servers/${serverId}/alerts/stats`);
@@ -155,26 +184,47 @@ app.patch('/api/alerts/:alertId', (req, res) => {
     return res.status(404).json({ error: 'Alerta no encontrada' });
   }
 
-  alert.resuelto = req.body.resuelto || false;
-  alert.resueltoEn = req.body.resueltoEn ? new Date(req.body.resueltoEn) : undefined;
+  const { resuelto, resueltoEn } = req.body;
+  alert.resuelto = Boolean(resuelto);
+  alert.resueltoEn = alert.resuelto ? (resueltoEn ? new Date(resueltoEn) : new Date()) : undefined;
 
   console.log(`✔️ PATCH /api/alerts/${alertId} - Alerta resuelta`);
-  res.json({ success: true });
+  res.json(alert);
 });
 
 // Función para simular alertas en tiempo real
 function broadcastSimulatedAlerts() {
-  const tipos = ['CPU', 'Memory', 'Disk', 'Network'];
-  const niveles = ['warning', 'critical'];
-  const recursos = ['CPU Usage', 'Memory Usage', 'Disk Space', 'Network Latency'];
+  const tipo = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+  const recurso = alertResources[Math.floor(Math.random() * alertResources.length)];
+
+  const alertByType = {
+    CRITICAL: {
+      valor: 92 + Math.floor(Math.random() * 8),
+      umbral: 90,
+      mensaje: `${recurso} por encima del umbral crítico`,
+    },
+    WARNING: {
+      valor: 75 + Math.floor(Math.random() * 15),
+      umbral: 80,
+      mensaje: `${recurso} por encima del umbral de advertencia`,
+    },
+    INFO: {
+      valor: 50 + Math.floor(Math.random() * 20),
+      umbral: undefined,
+      mensaje: `${recurso} sin incidencias relevantes`,
+    },
+  };
+
+  const currentAlert = alertByType[tipo];
 
   const newAlert = {
     id: `${Date.now()}`,
     serverId: Math.floor(Math.random() * 3) + 1,
-    tipo: tipos[Math.floor(Math.random() * tipos.length)],
-    recurso: recursos[Math.floor(Math.random() * recursos.length)],
-    nivel: niveles[Math.floor(Math.random() * niveles.length)],
-    mensaje: 'Alerta simulada desde backend provisional',
+    tipo,
+    recurso,
+    mensaje: currentAlert.mensaje,
+    valor: currentAlert.valor,
+    umbral: currentAlert.umbral,
     timestamp: new Date(),
     resuelto: false,
   };
@@ -191,7 +241,7 @@ function broadcastSimulatedAlerts() {
     });
   }
 
-  console.log(`🚨 Alerta simulada emitida: ${newAlert.tipo} - Servidor: ${newAlert.serverId}`);
+  console.log(`🚨 Alerta simulada emitida: ${newAlert.tipo} ${newAlert.recurso} - Servidor: ${newAlert.serverId}`);
 }
 
 // Iniciar simulación de alertas cada 10 segundos
@@ -211,7 +261,11 @@ app.get('/debug/alerts', (req, res) => {
       id: a.id,
       serverId: a.serverId,
       tipo: a.tipo,
+      recurso: a.recurso,
+      valor: a.valor,
+      umbral: a.umbral,
       resuelto: a.resuelto,
+      resueltoEn: a.resueltoEn,
       timestamp: a.timestamp,
     }))
   });

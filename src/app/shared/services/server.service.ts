@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom, take } from 'rxjs';
 import { Server } from '../interfaces/server';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 import { AlertManagerService } from './alert-manager.service';
@@ -42,6 +42,21 @@ export class ServerService implements OnDestroy {
    */
   getServerAlerts(serverId: number): Observable<ServerAlert[]> {
     return this.alertManager.getServerAlerts(serverId);
+  }
+
+  /**
+   * Cargar las alertas de varios servidores en una sola operación
+   */
+  async preloadServerAlerts(servers: Server[]): Promise<void> {
+    await Promise.all(
+      servers.map(async (server) => {
+        try {
+          await firstValueFrom(this.getServerAlerts(server.id).pipe(take(1)));
+        } catch (error) {
+          console.error(`❌ Error cargando alertas del servidor ${server.id}:`, error);
+        }
+      })
+    );
   }
 
   /**
