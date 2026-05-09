@@ -13,7 +13,7 @@ import { Component } from '@angular/core';
           </p>
 
           <p class="mt-1 text-xs text-gray-500">
-            Sistema funcionando correctamente.
+            Monitoreo de Servidores
           </p>
         </div>
 
