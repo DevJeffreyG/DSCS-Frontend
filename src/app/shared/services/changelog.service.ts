@@ -12,14 +12,14 @@ export class ChangelogService {
   changelogs$ = this.changelogSubject.asObservable();
 
   async getChangelogs(): Promise<Changelog[]> {
+    // TODO: API CALL
     return new Promise((resolve) => {
       resolve(this.getSortedChangelogs());
     });
   }
 
   async newChangelog(changelog: Changelog): Promise<void> {
-    console.log('Adding changelog in service:', changelog);
-
+    // TODO: API CALL
     return new Promise((resolve) => {
       this.dummyChangelogs.push(changelog);
       this.changelogSubject.next(this.getSortedChangelogs());

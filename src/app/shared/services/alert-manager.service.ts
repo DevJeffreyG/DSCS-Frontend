@@ -21,7 +21,7 @@ export class AlertManagerService implements OnDestroy {
     map((cache) => {
       const critical: ServerAlert[] = [];
       cache.forEach((alerts) => {
-        critical.push(...alerts.filter((a) => a.tipo === 'CRITICAL'));
+        critical.push(...alerts.filter((a) => a.tipo.toUpperCase() === 'CRITICAL'));
       });
       return critical;
     })
@@ -116,7 +116,7 @@ export class AlertManagerService implements OnDestroy {
         let filtered = [...alerts];
 
         if (filters.tipo) {
-          filtered = filtered.filter((a) => a.tipo === filters.tipo);
+          filtered = filtered.filter((a) => a.tipo.toUpperCase() === filters.tipo);
         }
 
         if (filters.recurso) {
@@ -139,9 +139,9 @@ export class AlertManagerService implements OnDestroy {
     return this.getServerAlerts(serverId).pipe(
       map((alerts) => ({
         total: alerts.length,
-        criticas: alerts.filter((a) => a.tipo === 'CRITICAL').length,
-        advertencias: alerts.filter((a) => a.tipo === 'WARNING').length,
-        informativas: alerts.filter((a) => a.tipo === 'INFO').length,
+        criticas: alerts.filter((a) => a.tipo.toUpperCase() === 'CRITICAL').length,
+        advertencias: alerts.filter((a) => a.tipo.toUpperCase() === 'WARNING').length,
+        informativas: alerts.filter((a) => a.tipo.toUpperCase() === 'INFO').length,
         resueltas: alerts.filter((a) => a.resuelto).length,
       }))
     );
@@ -236,7 +236,7 @@ export class AlertManagerService implements OnDestroy {
       map((cache) => {
         const critical: ServerAlert[] = [];
         cache.forEach((alerts) => {
-          critical.push(...alerts.filter((a) => a.tipo === 'CRITICAL'));
+          critical.push(...alerts.filter((a) => a.tipo.toUpperCase() === 'CRITICAL'));
         });
         return critical;
       })

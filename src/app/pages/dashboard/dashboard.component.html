@@ -1,1 +1,23 @@
-<p>dashboard works!</p>
+<div class="p-6">
+    <div class="mb-6">
+        <app-component-card [title]="'Dashboard'"
+            [desc]="`Visión general del estado de los servidores -- Ultima actualización: ${formatTimestamp(lastUpdate)}`">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-evenly gap-4">
+                <app-card-number [number]="servers.length" [title]="'Servidores'"
+                    [description]="'Número total de servidores'" />
+                <app-card-number [number]="cpuMean" [suffix]="'%'" [title]="'Promedio de CPU'"
+                    [description]="'Utilización promedio de CPU entre todos los servidores'" [bgColor]="'bg-purple-100'"
+                    [textColor]="'text-purple-500'" />
+                <app-card-number [number]="ramMean" [suffix]="'%'" [title]="'Promedio de RAM'"
+                    [description]="'Utilización promedio de RAM entre todos los servidores'" [bgColor]="'bg-gray-100'"
+                    [textColor]="'text-gray-500'" />
+                <app-card-number [number]="recentAlertsCount" [title]="'Alertas Críticas'"
+                    [description]="'Número de alertas críticas en la última hora'" [bgColor]="'bg-pink-100'"
+                    [textColor]="'text-pink-500'" />
+            </div>
+        </app-component-card>
+    </div>
+    <div class="col-span-12">
+        <app-last-events [allServers]="true" />
+    </div>
+</div>

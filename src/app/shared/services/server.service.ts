@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
-
+import { Observable, firstValueFrom, take } from 'rxjs';
 import { Server } from '../interfaces/server';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 
@@ -13,19 +12,19 @@ export class ServerService implements OnDestroy {
 
   constructor(
     private alertManager: AlertManagerService
-  ) {}
+  ) { }
 
-  
+
 
   async getAllServers(): Promise<Server[]> {
-
+    // TODO: API CALL
     return new Promise((resolve) => {
       resolve(this.dummyServers);
     });
 
   }
 
-  
+
 
   async getServersByRole(role: string): Promise<Server[]> {
 
@@ -48,37 +47,45 @@ export class ServerService implements OnDestroy {
 
   }
 
-  
+
 
   async addServer(server: Server): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
 
-    this.dummyServers.push(server);
-
+      this.dummyServers.push(server);
+      resolve();
+    });
   }
 
 
 
   async deleteServer(id: number): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      this.dummyServers = this.dummyServers.filter(
+        s => s.id !== id
+      );
 
-    this.dummyServers = this.dummyServers.filter(
-      s => s.id !== id
-    );
-
+      resolve();
+    });
   }
 
 
 
   async updateServer(updatedServer: Server): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      const index = this.dummyServers.findIndex(
+        s => s.id === updatedServer.id
+      );
 
-    const index = this.dummyServers.findIndex(
-      s => s.id === updatedServer.id
-    );
+      if (index !== -1) {
+        this.dummyServers[index] = updatedServer;
+      }
 
-    if (index !== -1) {
-
-      this.dummyServers[index] = updatedServer;
-
-    }
+      resolve();
+    });
 
   }
 
@@ -127,6 +134,24 @@ export class ServerService implements OnDestroy {
     return this.alertManager.getServerAlerts(serverId);
   }
 
+  /**
+   * Cargar las alertas de varios servidores en una sola operación
+   */
+  async preloadServerAlerts(servers: Server[]): Promise<void> {
+    await Promise.all(
+      servers.map(async (server) => {
+        try {
+          await firstValueFrom(this.getServerAlerts(server.id).pipe(take(1)));
+        } catch (error) {
+          console.error(`❌ Error cargando alertas del servidor ${server.id}:`, error);
+        }
+      })
+    );
+  }
+
+  /**
+   * Obtener alertas históricas desde el backend con filtros
+   */
   getHistoricalAlerts(
     serverId: number,
     filters?: AlertFilter
