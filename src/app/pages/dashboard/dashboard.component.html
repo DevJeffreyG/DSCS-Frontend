@@ -2,7 +2,7 @@
     <div class="mb-6">
         <app-component-card [title]="'Dashboard'"
             [desc]="`Visión general del estado de los servidores -- Ultima actualización: ${formatTimestamp(lastUpdate)}`">
-            <div class="flex flex-row justify-evenly gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-evenly gap-4">
                 <app-card-number [number]="servers.length" [title]="'Servidores'"
                     [description]="'Número total de servidores'" />
                 <app-card-number [number]="cpuMean" [suffix]="'%'" [title]="'Promedio de CPU'"
