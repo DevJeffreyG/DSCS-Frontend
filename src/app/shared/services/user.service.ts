@@ -7,49 +7,128 @@ import { LoggeduserService } from './loggeduser.service';
   providedIn: 'root',
 })
 export class UserService {
+
+  // =====================================
+  // GET USERS
+  // =====================================
   async getUsers(): Promise<User[]> {
+
     return this.dummyUsers;
+
   }
 
+  // =====================================
+  // ADD USER
+  // =====================================
   async addUser(user: User): Promise<void> {
+
     this.dummyUsers.push(user);
+
   }
 
-  async getUserById(id: number): Promise<User | undefined> {
+  // =====================================
+  // GET USER BY ID
+  // =====================================
+  async getUserById(
+    id: number
+  ): Promise<User | undefined> {
+
     return new Promise((resolve) => {
-      const user = this.dummyUsers.find(u => u.id_usuario === id);
+
+      const user =
+        this.dummyUsers.find(
+          u => u.id_usuario === id
+        );
+
       resolve(user);
+
     });
+
   }
 
-  // LOGIN
-  async login(correo: string, contraseña: string): Promise<User | null> {
+  // =====================================
+  // UPDATE USER
+  // =====================================
+  async updateUser(
+    id: number,
+    updatedUser: User
+  ): Promise<void> {
 
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      const user = this.dummyUsers.find(
-        u =>
-          u.correo === correo &&
-          u.contraseña === contraseña
+    const index =
+      this.dummyUsers.findIndex(
+        u => u.id_usuario === id
       );
 
-      if(!user) {
-        reject(new Error('Correo o contraseña incorrectos'));
-        return;
-      }
+    if (index !== -1) {
 
-      LoggeduserService.setUser(user)
+      this.dummyUsers[index] =
+        updatedUser;
 
-      if (user) {
-        // guardar sesión
-        localStorage.setItem('auth', 'true');
-      }
+    }
 
-      resolve(user);
-    });
   }
 
+  // =====================================
+  // DELETE USER
+  // =====================================
+  async deleteUser(
+    id: number
+  ): Promise<void> {
+
+    this.dummyUsers =
+      this.dummyUsers.filter(
+        u => u.id_usuario !== id
+      );
+
+  }
+
+  // =====================================
+  // LOGIN
+  // =====================================
+  async login(
+    correo: string,
+    contraseña: string
+  ): Promise<User | null> {
+
+    return new Promise((resolve, reject) => {
+
+      const user =
+        this.dummyUsers.find(
+          u =>
+            u.correo === correo &&
+            u.contraseña === contraseña
+        );
+
+      if (!user) {
+
+        reject(
+          new Error(
+            'Correo o contraseña incorrectos'
+          )
+        );
+
+        return;
+
+      }
+
+      LoggeduserService.setUser(user);
+
+      localStorage.setItem(
+        'auth',
+        'true'
+      );
+
+      resolve(user);
+
+    });
+
+  }
+
+  // =====================================
+  // DUMMY USERS
+  // =====================================
   private dummyUsers: User[] = [
+
     {
       id_usuario: 1,
       nombre: 'Admin User',
@@ -57,6 +136,7 @@ export class UserService {
       contraseña: 'admin123',
       rol: UserRole.Admin,
     },
+
     {
       id_usuario: 2,
       nombre: 'Operator User',
@@ -64,6 +144,7 @@ export class UserService {
       contraseña: 'operator123',
       rol: UserRole.Operator,
     },
+
     {
       id_usuario: 3,
       nombre: 'Regular User',
@@ -71,5 +152,7 @@ export class UserService {
       contraseña: 'user123',
       rol: UserRole.User,
     }
+
   ];
+
 }
