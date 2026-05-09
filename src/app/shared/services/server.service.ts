@@ -12,19 +12,19 @@ export class ServerService implements OnDestroy {
 
   constructor(
     private alertManager: AlertManagerService
-  ) {}
+  ) { }
 
-  
+
 
   async getAllServers(): Promise<Server[]> {
-
+    // TODO: API CALL
     return new Promise((resolve) => {
       resolve(this.dummyServers);
     });
 
   }
 
-  
+
 
   async getServersByRole(role: string): Promise<Server[]> {
 
@@ -47,37 +47,45 @@ export class ServerService implements OnDestroy {
 
   }
 
-  
+
 
   async addServer(server: Server): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
 
-    this.dummyServers.push(server);
-
+      this.dummyServers.push(server);
+      resolve();
+    });
   }
 
 
 
   async deleteServer(id: number): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      this.dummyServers = this.dummyServers.filter(
+        s => s.id !== id
+      );
 
-    this.dummyServers = this.dummyServers.filter(
-      s => s.id !== id
-    );
-
+      resolve();
+    });
   }
 
 
 
   async updateServer(updatedServer: Server): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      const index = this.dummyServers.findIndex(
+        s => s.id === updatedServer.id
+      );
 
-    const index = this.dummyServers.findIndex(
-      s => s.id === updatedServer.id
-    );
+      if (index !== -1) {
+        this.dummyServers[index] = updatedServer;
+      }
 
-    if (index !== -1) {
-
-      this.dummyServers[index] = updatedServer;
-
-    }
+      resolve();
+    });
 
   }
 

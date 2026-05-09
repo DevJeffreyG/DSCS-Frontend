@@ -12,84 +12,76 @@ export class UserService {
   // GET USERS
   // =====================================
   async getUsers(): Promise<User[]> {
-
-    return this.dummyUsers;
-
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      resolve(this.dummyUsers);
+    });
   }
 
-  // =====================================
-  // ADD USER
-  // =====================================
   async addUser(user: User): Promise<void> {
-
-    this.dummyUsers.push(user);
-
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      this.dummyUsers.push(user);
+      resolve();
+    });
   }
 
-  // =====================================
-  // GET USER BY ID
-  // =====================================
   async getUserById(
     id: number
   ): Promise<User | undefined> {
-
+    // TODO: API CALL
     return new Promise((resolve) => {
-
       const user =
         this.dummyUsers.find(
           u => u.id_usuario === id
         );
 
       resolve(user);
-
     });
 
   }
 
-  // =====================================
-  // UPDATE USER
-  // =====================================
   async updateUser(
     id: number,
     updatedUser: User
   ): Promise<void> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
 
-    const index =
-      this.dummyUsers.findIndex(
-        u => u.id_usuario === id
-      );
+      const index =
+        this.dummyUsers.findIndex(
+          u => u.id_usuario === id
+        );
 
-    if (index !== -1) {
+      if (index !== -1) {
 
-      this.dummyUsers[index] =
-        updatedUser;
+        this.dummyUsers[index] =
+          updatedUser;
 
-    }
+      }
+      resolve();
+    });
 
   }
 
-  // =====================================
-  // DELETE USER
-  // =====================================
   async deleteUser(
     id: number
   ): Promise<void> {
-
+    // TODO: API CALL
+    return new Promise((resolve) => {
     this.dummyUsers =
       this.dummyUsers.filter(
         u => u.id_usuario !== id
       );
-
+      resolve();
+    });
   }
 
-  // =====================================
-  // LOGIN
-  // =====================================
   async login(
     correo: string,
     contraseña: string
   ): Promise<User | null> {
-
+    // TODO: API CALL
     return new Promise((resolve, reject) => {
 
       const user =
@@ -124,9 +116,6 @@ export class UserService {
 
   }
 
-  // =====================================
-  // DUMMY USERS
-  // =====================================
   private dummyUsers: User[] = [
 
     {
