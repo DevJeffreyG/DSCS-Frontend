@@ -1,0 +1,110 @@
+<div class="p-6">
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">
+        Panel de Servidores
+      </h1>
+
+      <p class="text-gray-500">
+        Monitoreo en tiempo real de computadores y servidores
+      </p>
+    </div>
+
+    <button class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition">
+      + Agregar Servidor
+    </button>
+  </div>
+
+  <!-- GRID SERVIDORES -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+    @for (server of servers; track server.id) {
+
+      <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between mb-4">
+
+          <div>
+            <h2 class="text-xl font-semibold text-gray-800">
+              {{ server.nombre }}
+            </h2>
+
+            <p class="text-sm text-gray-500">
+              {{ server.ip }}
+            </p>
+          </div>
+
+          <div
+            class="px-3 py-1 rounded-full text-sm font-medium"
+            [class.bg-green-100]="server.estado === 'Online'"
+            [class.text-green-700]="server.estado === 'Online'"
+            [class.bg-red-100]="server.estado === 'Offline'"
+            [class.text-red-700]="server.estado === 'Offline'"
+          >
+            {{ server.estado }}
+          </div>
+
+        </div>
+
+        <!-- CPU -->
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-700">CPU</span>
+            <span class="text-sm text-gray-500">{{ server.cpu }}%</span>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div
+              class="bg-blue-600 h-3 rounded-full"
+              [style.width.%]="server.cpu"
+            ></div>
+          </div>
+        </div>
+
+        <!-- RAM -->
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-700">RAM</span>
+            <span class="text-sm text-gray-500">{{ server.ram }}%</span>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div
+              class="bg-green-600 h-3 rounded-full"
+              [style.width.%]="server.ram"
+            ></div>
+          </div>
+        </div>
+
+        <!-- DISCO -->
+        <div class="mb-6">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-700">Disco</span>
+            <span class="text-sm text-gray-500">{{ server.disco }}%</span>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div
+              class="bg-orange-500 h-3 rounded-full"
+              [style.width.%]="server.disco"
+            ></div>
+          </div>
+        </div>
+
+        <!-- BOTON -->
+        <button
+          class="w-full bg-gray-900 text-white py-3 rounded-xl hover:bg-black transition"
+          (click)="monitorFullView(server)"
+        >
+          Ver Monitor
+        </button>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

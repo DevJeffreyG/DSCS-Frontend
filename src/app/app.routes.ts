@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ServersComponent } from './pages/servers/servers.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FormElementsComponent } from './pages/forms/form-elements/form-elements.component';
 import { BasicTablesComponent } from './pages/tables/basic-tables/basic-tables.component';
@@ -23,6 +23,7 @@ import { CalenderComponent } from './pages/calender/calender.component';
 import { authGuard } from './guards/auth.guard';
 import { MonitorComponent } from './pages/monitor/monitor.component';
 import { ConfigComponent } from './pages/config/config.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 export const routes: Routes = [
 
@@ -52,11 +53,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
 
     children: [
-
-      // Dashboard principal de servidores
       {
         path: 'dashboard',
         component: DashboardComponent,
+        title: 'Dashboard'
+      },
+      {
+        path: 'servers',
+        component: ServersComponent,
         title: 'Panel de Servidores'
       },
       {
