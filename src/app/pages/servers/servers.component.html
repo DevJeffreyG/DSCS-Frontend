@@ -1,6 +1,8 @@
 <div class="p-6">
 
+  <!-- HEADER -->
   <div class="flex items-center justify-between mb-6">
+
     <div>
       <h1 class="text-3xl font-bold text-gray-800">
         Panel de Servidores
@@ -11,12 +13,63 @@
       </p>
     </div>
 
-    <button class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition">
+    <!-- BOTON -->
+    <button
+      class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
+      (click)="showForm = !showForm"
+    >
       + Agregar Servidor
     </button>
+
   </div>
 
-  <!-- GRID SERVIDORES -->
+  <!-- FORMULARIO -->
+  @if (showForm) {
+
+    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-200 mb-6">
+
+      <h2 class="text-xl font-bold mb-4">
+        Nuevo Servidor
+      </h2>
+
+      <!-- NOMBRE -->
+      <input
+        type="text"
+        placeholder="Nombre del servidor"
+        [(ngModel)]="newServer.nombre"
+        class="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <!-- IP -->
+      <input
+        type="text"
+        placeholder="IP del servidor"
+        [(ngModel)]="newServer.ip"
+        class="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <!-- ESTADO -->
+      <select
+        [(ngModel)]="newServer.estado"
+        class="w-full border p-3 rounded-xl mb-4"
+      >
+        <option value="Online">Online</option>
+        <option value="Offline">Offline</option>
+      </select>
+
+      <!-- GUARDAR -->
+      <button
+        class="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700"
+        (click)="addServer()"
+      >
+        Guardar Servidor
+      </button>
+
+    </div>
+
+  }
+
+  <!-- GRID -->
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
     @for (server of servers; track server.id) {
@@ -27,6 +80,7 @@
         <div class="flex items-center justify-between mb-4">
 
           <div>
+
             <h2 class="text-xl font-semibold text-gray-800">
               {{ server.nombre }}
             </h2>
@@ -34,6 +88,7 @@
             <p class="text-sm text-gray-500">
               {{ server.ip }}
             </p>
+
           </div>
 
           <div
@@ -50,9 +105,10 @@
 
         <!-- CPU -->
         <div class="mb-4">
+
           <div class="flex justify-between mb-1">
-            <span class="text-sm font-medium text-gray-700">CPU</span>
-            <span class="text-sm text-gray-500">{{ server.cpu }}%</span>
+            <span>CPU</span>
+            <span>{{ server.cpu }}%</span>
           </div>
 
           <div class="w-full bg-gray-200 rounded-full h-3">
@@ -61,13 +117,15 @@
               [style.width.%]="server.cpu"
             ></div>
           </div>
+
         </div>
 
         <!-- RAM -->
         <div class="mb-4">
+
           <div class="flex justify-between mb-1">
-            <span class="text-sm font-medium text-gray-700">RAM</span>
-            <span class="text-sm text-gray-500">{{ server.ram }}%</span>
+            <span>RAM</span>
+            <span>{{ server.ram }}%</span>
           </div>
 
           <div class="w-full bg-gray-200 rounded-full h-3">
@@ -76,13 +134,15 @@
               [style.width.%]="server.ram"
             ></div>
           </div>
+
         </div>
 
         <!-- DISCO -->
         <div class="mb-6">
+
           <div class="flex justify-between mb-1">
-            <span class="text-sm font-medium text-gray-700">Disco</span>
-            <span class="text-sm text-gray-500">{{ server.disco }}%</span>
+            <span>Disco</span>
+            <span>{{ server.disco }}%</span>
           </div>
 
           <div class="w-full bg-gray-200 rounded-full h-3">
@@ -91,6 +151,7 @@
               [style.width.%]="server.disco"
             ></div>
           </div>
+
         </div>
 
         <!-- BOTON -->
