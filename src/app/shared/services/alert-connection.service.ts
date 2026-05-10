@@ -11,39 +11,10 @@ import { ServerAlert, AlertFilter } from '../interfaces/alert';
 })
 export class AlertConnectionService {
   private mode: 'real' | 'testing' = 'real';
-  private currentSource: AlertListenerService;
-  private modeSubject = new Subject<'real' | 'testing'>();
-
-  public mode$ = this.modeSubject.asObservable();
 
   constructor(
     private realListener: AlertListenerService
   ) {
-    this.currentSource = this.realListener;
-  }
-
-  /**
-   * Cambiar a modo real con WebSocket
-   */
-  setRealMode() {
-    console.log('🔗 Cambiando a modo REAL (WebSocket)');
-    this.mode = 'real';
-    this.currentSource = this.realListener;
-    this.modeSubject.next('real');
-  }
-
-  /**
-   * Obtener modo actual
-   */
-  getMode(): 'real' | 'testing' {
-    return this.mode;
-  }
-
-  /**
-   * Obtener alertas según modo actual
-   */
-  getAlerts$(): Observable<ServerAlert> {
-    return this.realListener.alerts$;
   }
 
   /**
@@ -53,12 +24,6 @@ export class AlertConnectionService {
     serverId: number,
     filters?: AlertFilter
   ): Observable<ServerAlert[]> {
-    if (this.mode === 'testing') {
-      return new Observable((observer) => {
-        observer.next([]);
-        observer.complete();
-      });
-    }
     return this.realListener.getHistoricalAlerts(serverId, filters);
   }
 
@@ -66,12 +31,6 @@ export class AlertConnectionService {
    * Resolver alerta
    */
   resolveAlert(alertId: string): Observable<void> {
-    if (this.mode === 'testing') {
-      return new Observable((observer) => {
-        observer.next();
-        observer.complete();
-      });
-    }
     return this.realListener.resolveAlert(alertId);
   }
 

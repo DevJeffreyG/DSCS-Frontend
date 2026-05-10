@@ -10,49 +10,28 @@ import { AlertManagerService } from './alert-manager.service';
 })
 export class ServerService implements OnDestroy {
 
-  constructor(
-    private alertManager: AlertManagerService
-  ) { }
-
-
+  constructor(private alertManager: AlertManagerService) { }
 
   async getAllServers(): Promise<Server[]> {
     // TODO: API CALL
     return new Promise((resolve) => {
       resolve(this.dummyServers);
     });
-
   }
 
-
-
-  async getServersByRole(role: string): Promise<Server[]> {
-
-    // ADMIN VE TODO
-    if (role === 'Admin') {
-      return this.dummyServers;
-    }
-
-    // OPERATOR SOLO ONLINE
-    if (role === 'Operator') {
-
-      return this.dummyServers.filter(
-        s => s.estado === 'Online'
+  async getServerById(id: number): Promise<Server | undefined> {
+    // TODO: API CALL
+    return new Promise((resolve) => {
+      const server = this.dummyServers.find(
+        s => s.id === id
       );
-
-    }
-
-    // USER SOLO EL PRIMERO
-    return this.dummyServers.slice(0, 1);
-
+      resolve(server);
+    });
   }
-
-
 
   async addServer(server: Server): Promise<void> {
     // TODO: API CALL
     return new Promise((resolve) => {
-
       this.dummyServers.push(server);
       resolve();
     });
@@ -91,44 +70,27 @@ export class ServerService implements OnDestroy {
 
 
 
-  async getServerUsage(serverId: number): Promise<{
-    cpu: number;
-    ram: number;
-    disco: number;
-    red: number;
-  }> {
-
+  async getServerUsage(serverId: number): Promise<{ cpu: number; ram: number; disco: number; red: number; }> {
     return new Promise((resolve) => {
-
-      const server = this.dummyServers.find(
-        s => s.id === serverId
-      );
-
-      if (server) {
-
-        resolve({
-          cpu: server.cpu,
-          ram: server.ram,
-          disco: server.disco,
-          red: server.red
-        });
-
-      } else {
-
-        resolve({
-          cpu: 0,
-          ram: 0,
-          disco: 0,
-          red: 0
-        });
-
-      }
-
-    });
-
+      this.getServerById(serverId).then(server => {
+        if (server) {
+          resolve({
+            cpu: server.cpu,
+            ram: server.ram,
+            disco: server.disco,
+            red: server.red
+          });
+        } else {
+          resolve({
+            cpu: 0,
+            ram: 0,
+            disco: 0,
+            red: 0
+          });
+        }
+      });
+    })
   }
-
-
 
   getServerAlerts(serverId: number): Observable<ServerAlert[]> {
     return this.alertManager.getServerAlerts(serverId);
@@ -152,91 +114,53 @@ export class ServerService implements OnDestroy {
   /**
    * Obtener alertas históricas desde el backend con filtros
    */
-  getHistoricalAlerts(
-    serverId: number,
-    filters?: AlertFilter
-  ): Observable<ServerAlert[]> {
-
+  getHistoricalAlerts(serverId: number, filters?: AlertFilter): Observable<ServerAlert[]> {
     return this.alertManager.getHistoricalAlerts(
       serverId,
       filters
     );
-
   }
 
-  getActiveAlertsFromBackend(
-    serverId: number
-  ): Observable<ServerAlert[]> {
-
+  getActiveAlertsFromBackend(serverId: number): Observable<ServerAlert[]> {
     return this.alertManager.getActiveAlertsFromBackend(
       serverId
     );
-
   }
 
-  getFilteredAlerts(
-    serverId: number,
-    filters: AlertFilter
-  ): Observable<ServerAlert[]> {
-
+  getFilteredAlerts(serverId: number, filters: AlertFilter): Observable<ServerAlert[]> {
     return this.alertManager.getFilteredAlerts(
       serverId,
       filters
     );
-
   }
 
   getAlertStats(serverId: number): Observable<AlertStats> {
-
     return this.alertManager.getAlertStats(serverId);
-
   }
 
   getAllCriticalAlerts(): Observable<ServerAlert[]> {
-
     return this.alertManager.getAllCriticalAlerts();
-
   }
 
   resolveAlert(alertId: string): Observable<void> {
-
     return this.alertManager.resolveAlert(alertId);
-
   }
 
-  subscribeToServerAlerts(
-    serverId: number
-  ): Observable<ServerAlert> {
-
+  subscribeToServerAlerts(serverId: number): Observable<ServerAlert> {
     return this.alertManager.subscribeToServer(serverId);
-
   }
 
   unsubscribeFromServerAlerts(serverId: number): void {
-
     this.alertManager.unsubscribeFromServer(serverId);
-
   }
 
   clearResolvedAlerts(serverId: number): void {
-
     this.alertManager.clearResolvedAlerts(serverId);
-
   }
 
   clearServerAlerts(serverId: number): void {
-
     this.alertManager.clearAllAlerts(serverId);
-
   }
-
-  isAlertListenerConnected$(): Observable<boolean> {
-
-    return this.alertManager.isConnected$();
-
-  }
-
-
 
   private dummyServers: Server[] = [
 

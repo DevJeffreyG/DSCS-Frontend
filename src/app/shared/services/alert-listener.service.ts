@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
 import { io, Socket } from 'socket.io-client';
-import { ServerAlert, AlertFilter } from '../interfaces/alert';
+import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 
 @Injectable({
   providedIn: 'root',
@@ -91,8 +91,7 @@ export class AlertListenerService implements OnDestroy {
     const url = `${this.backendUrl}/api/servers/${serverId}/alerts`;
     console.log(`📥 Obteniendo alertas históricas de ${url}`, { filters });
 
-    return this.http
-      .get<ServerAlert[]>(url, {
+    return this.http.get<ServerAlert[]>(url, {
         params,
       })
       .pipe(
@@ -150,8 +149,8 @@ export class AlertListenerService implements OnDestroy {
   /**
    * Obtener estadísticas de alertas
    */
-  getAlertStats(serverId: number): Observable<any> {
-    return this.http.get(`${this.backendUrl}/api/servers/${serverId}/alerts/stats`);
+  getAlertStats(serverId: number): Observable<AlertStats> {
+    return this.http.get<AlertStats>(`${this.backendUrl}/api/servers/${serverId}/alerts/stats`);
   }
 
   /**
