@@ -21,6 +21,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 export class LastEventsComponent implements OnInit, OnDestroy {
     @Input() serverId: number = 1; // ID del servidor a monitorear
     @Input() allServers: boolean = false; // Mostrar alertas de TODOS los servidores
+    @Input() showResolveButton: boolean = false; // Mostrar botón para resolver alertas
 
     alerts: ServerAlert[] = [];
     serverMap: Record<number, string> = {}; // id -> nombre
@@ -52,7 +53,6 @@ export class LastEventsComponent implements OnInit, OnDestroy {
               const allAlerts = Array.from(cache.values()).flat();
               this.alerts = allAlerts
                 .sort((a: ServerAlert, b: ServerAlert) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                .slice(0, 10);
               this.isLoading = false;
               console.log(`✅ Mostrando ${this.alerts.length} alertas (todos los servidores)`);
             });
@@ -72,7 +72,6 @@ export class LastEventsComponent implements OnInit, OnDestroy {
             // Mostrar solo las últimas 10 alertas, ordenadas por timestamp descendente
             this.alerts = alerts
               .sort((a: ServerAlert, b: ServerAlert) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-              .slice(0, 10);
             console.log(`✅ Mostrando ${this.alerts.length} alertas en la UI`);
           });
       }
@@ -115,5 +114,17 @@ export class LastEventsComponent implements OnInit, OnDestroy {
     if (diffDays < 7) return `Hace ${diffDays}d`;
     
     return d.toLocaleDateString();
+  }
+
+  resolveAlert(alertId: string): void {
+    console.log(`🔧 Resolviendo alerta ${alertId}...`);
+    this.alertManager.resolveAlert(alertId).subscribe(
+      () => {
+        console.log(`✅ Alerta ${alertId} resuelta`);
+      },
+      (error) => {
+        console.error(`❌ Error resolviendo alerta ${alertId}:`, error);
+      }
+    );
   }
 }
