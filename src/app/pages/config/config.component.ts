@@ -33,7 +33,9 @@ export class ConfigComponent {
   private config!: Config;
 
   // track color (unfilled)
-  trackColor = '#e5e7eb'; // gray-200`
+  get trackColor(): string {
+    return document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb';
+  }
 
   constructor(private configService: ConfigService, private changelogService: ChangelogService) { }
 

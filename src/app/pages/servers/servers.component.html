@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between mb-6">
 
     <div>
-      <h1 class="text-3xl font-bold text-gray-800">
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white/90">
         Panel de Servidores
       </h1>
 
@@ -26,9 +26,9 @@
   <!-- FORMULARIO -->
   @if (showForm) {
 
-    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-200 mb-6">
+    <div class=" border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6 rounded-2xl shadow-md border mb-6">
 
-      <h2 class="text-xl font-bold mb-4">
+      <h2 class="text-xl font-bold mb-4 dark:text-white/90">
         Nuevo Servidor
       </h2>
 
@@ -37,7 +37,7 @@
         type="text"
         placeholder="Nombre del servidor"
         [(ngModel)]="newServer.nombre"
-        class="w-full border p-3 rounded-xl mb-4"
+        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
       />
 
       <!-- IP -->
@@ -45,13 +45,13 @@
         type="text"
         placeholder="IP del servidor"
         [(ngModel)]="newServer.ip"
-        class="w-full border p-3 rounded-xl mb-4"
+        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
       />
 
       <!-- ESTADO -->
       <select
         [(ngModel)]="newServer.estado"
-        class="w-full border p-3 rounded-xl mb-4"
+        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
       >
         <option value="Online">Online</option>
         <option value="Offline">Offline</option>
@@ -62,7 +62,7 @@
         class="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700"
         (click)="addServer()"
       >
-        Guardar Servidor
+        Crear
       </button>
 
     </div>
@@ -74,18 +74,18 @@
 
     @for (server of servers; track server.id) {
 
-      <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200 dark:bg-white/[0.03] dark:border-gray-800">
 
         <!-- HEADER -->
         <div class="flex items-center justify-between mb-4">
 
           <div>
 
-            <h2 class="text-xl font-semibold text-gray-800">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white/90">
               {{ server.nombre }}
             </h2>
 
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
               {{ server.ip }}
             </p>
 
@@ -107,11 +107,11 @@
         <div class="mb-4">
 
           <div class="flex justify-between mb-1">
-            <span>CPU</span>
-            <span>{{ server.cpu }}%</span>
+            <span class="dark:text-white/90">CPU</span>
+            <span class="dark:text-white/90">{{ server.cpu }}%</span>
           </div>
 
-          <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3">
             <div
               class="bg-blue-600 h-3 rounded-full"
               [style.width.%]="server.cpu"
@@ -124,11 +124,11 @@
         <div class="mb-4">
 
           <div class="flex justify-between mb-1">
-            <span>RAM</span>
-            <span>{{ server.ram }}%</span>
+            <span class="dark:text-white/90">RAM</span>
+            <span class="dark:text-white/90">{{ server.ram }}%</span>
           </div>
 
-          <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3">
             <div
               class="bg-green-600 h-3 rounded-full"
               [style.width.%]="server.ram"
@@ -141,11 +141,11 @@
         <div class="mb-6">
 
           <div class="flex justify-between mb-1">
-            <span>Disco</span>
-            <span>{{ server.disco }}%</span>
+            <span class="dark:text-white/90">Disco</span>
+            <span class="dark:text-white/90">{{ server.disco }}%</span>
           </div>
 
-          <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3">
             <div
               class="bg-orange-500 h-3 rounded-full"
               [style.width.%]="server.disco"

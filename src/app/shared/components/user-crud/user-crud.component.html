@@ -168,7 +168,7 @@
 
                         <td
                             colspan="5"
-                            class="px-5 py-8 text-center text-gray-500"
+                            class="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
                         >
                             No hay usuarios registrados
                         </td>
@@ -179,25 +179,25 @@
 
                     @for (user of users; track user.id_usuario) {
 
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition">
 
                             <!-- ID -->
-                            <td class="px-5 py-4 text-start">
+                            <td class="px-5 py-4 text-start dark:text-white/90">
                                 {{ user.id_usuario }}
                             </td>
 
                             <!-- NOMBRE -->
-                            <td class="px-4 py-3 text-start">
+                            <td class="px-4 py-3 text-start dark:text-white/90">
                                 {{ user.nombre }}
                             </td>
 
                             <!-- EMAIL -->
-                            <td class="px-4 py-3 text-start">
+                            <td class="px-4 py-3 text-start dark:text-white/90">
                                 {{ user.correo }}
                             </td>
 
                             <!-- ROL -->
-                            <td class="px-4 py-3 text-start">
+                            <td class="px-4 py-3 text-start dark:text-white/90">
                                 {{ getRole(user.rol) | titlecase }}
                             </td>
 

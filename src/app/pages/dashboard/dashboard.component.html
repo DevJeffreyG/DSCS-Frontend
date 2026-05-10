@@ -6,14 +6,14 @@
                 <app-card-number [number]="servers.length" [title]="'Servidores'"
                     [description]="'Número total de servidores'" />
                 <app-card-number [number]="cpuMean" [suffix]="'%'" [title]="'Promedio de CPU'"
-                    [description]="'Utilización promedio de CPU entre todos los servidores'" [bgColor]="'bg-purple-100'"
-                    [textColor]="'text-purple-500'" />
+                    [description]="'Utilización promedio de CPU entre todos los servidores'" [bgColor]="'bg-purple-100 dark:bg-purple-900/50'"
+                    [textColor]="'text-purple-500 dark:text-purple-400'" />
                 <app-card-number [number]="ramMean" [suffix]="'%'" [title]="'Promedio de RAM'"
-                    [description]="'Utilización promedio de RAM entre todos los servidores'" [bgColor]="'bg-gray-100'"
-                    [textColor]="'text-gray-500'" />
+                    [description]="'Utilización promedio de RAM entre todos los servidores'" [bgColor]="'bg-gray-100 dark:bg-gray-800/50'"
+                    [textColor]="'text-gray-500 dark:text-gray-400'" />
                 <app-card-number [number]="recentAlertsCount" [title]="'Alertas Críticas'"
-                    [description]="'Número de alertas críticas en la última hora'" [bgColor]="'bg-pink-100'"
-                    [textColor]="'text-pink-500'" />
+                    [description]="'Número de alertas críticas en la última hora'" [bgColor]="'bg-pink-100 dark:bg-pink-900/50'"
+                    [textColor]="'text-pink-500 dark:text-pink-400'" />
             </div>
         </app-component-card>
     </div>
