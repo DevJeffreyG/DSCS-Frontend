@@ -14,12 +14,10 @@ import { SigninFormComponent } from '../../../shared/components/auth/signin-form
 })
 export class SignInComponent {
 
-  constructor(private router: Router) {}
-
-  login() {
-    // 🔐 login simple
-    localStorage.setItem('auth', 'true');
-    this.router.navigate(['/dashboard']);
+  constructor(private router: Router) {
+    if(localStorage.getItem('auth') === 'true') {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
 }
