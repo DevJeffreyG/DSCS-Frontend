@@ -132,16 +132,7 @@ export class UserService {
       correo: 'operator@example.com',
       contraseña: 'operator123',
       rol: UserRole.Operator,
-    },
-
-    {
-      id_usuario: 3,
-      nombre: 'Regular User',
-      correo: 'user@example.com',
-      contraseña: 'user123',
-      rol: UserRole.User,
     }
-
   ];
 
 }

@@ -69,11 +69,6 @@ export class UserCrudComponent {
     {
       value: UserRole.Operator,
       label: 'Operator'
-    },
-
-    {
-      value: UserRole.User,
-      label: 'User'
     }
 
   ];
@@ -128,7 +123,7 @@ export class UserCrudComponent {
 
     this.userPassword = '';
 
-    this.userRole = UserRole.User;
+    this.userRole = UserRole.Operator;
 
     // OPEN
     this.addUserIsOpen = true;
@@ -173,7 +168,7 @@ export class UserCrudComponent {
 
         contraseña: this.userPassword,
 
-        rol: this.userRole || UserRole.User
+        rol: this.userRole || UserRole.Operator
 
       };
 
@@ -229,7 +224,7 @@ export class UserCrudComponent {
 
         contraseña: this.userPassword,
 
-        rol: this.userRole || UserRole.User
+        rol: this.userRole || UserRole.Operator
 
       };
 
@@ -275,7 +270,7 @@ export class UserCrudComponent {
 
     this.userPassword = '';
 
-    this.userRole = UserRole.User;
+    this.userRole = UserRole.Operator;
 
     // =====================================
     // CLOSE
