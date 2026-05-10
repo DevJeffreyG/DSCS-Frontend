@@ -6,6 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { ServerService } from '../../shared/services/server.service';
 import { Server } from '../../shared/interfaces/server';
 
+import { LoggeduserService } from '../../shared/services/loggeduser.service';
+import { UserRole } from '../../shared/enums/user-role';
+
 @Component({
   selector: 'app-servers',
   standalone: true,
@@ -22,6 +25,10 @@ export class ServersComponent {
 
   showForm = false;
 
+  currentUserRole: UserRole | null = null;
+
+  userRoles = UserRole;
+
   newServer: any = {
     nombre: '',
     ip: '',
@@ -35,14 +42,31 @@ export class ServersComponent {
 
   async ngOnInit() {
 
+    // CARGAR SERVIDORES
     this.servers =
       await this.serverService.getAllServers();
 
+    // OBTENER USUARIO LOGUEADO
+    const user =
+      LoggeduserService.getUser();
+
+    if (user) {
+
+      this.currentUserRole =
+        user.rol;
+
+    }
+
   }
 
-  // =========================
-  // VER MONITOR
-  // =========================
+  
+  isOperator(): boolean {
+
+    return this.currentUserRole === UserRole.Operator;
+
+  }
+
+  
   monitorFullView(server: Server) {
 
     this.router.navigate(
@@ -54,10 +78,13 @@ export class ServersComponent {
 
   }
 
-  // =========================
-  // AGREGAR
-  // =========================
+  
   async addServer() {
+
+    // BLOQUEAR OPERADOR
+    if (this.isOperator()) {
+      return;
+    }
 
     if (!this.newServer.nombre) return;
 

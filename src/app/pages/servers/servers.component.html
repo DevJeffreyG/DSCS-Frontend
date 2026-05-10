@@ -13,20 +13,24 @@
       </p>
     </div>
 
-    <!-- BOTON -->
-    <button
-      class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
-      (click)="showForm = !showForm"
-    >
-      + Agregar Servidor
-    </button>
+    <!-- BOTON SOLO ADMIN -->
+    @if (!isOperator()) {
+
+      <button
+        class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
+        (click)="showForm = !showForm"
+      >
+        + Agregar Servidor
+      </button>
+
+    }
 
   </div>
 
   <!-- FORMULARIO -->
-  @if (showForm) {
+  @if (showForm && !isOperator()) {
 
-    <div class=" border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6 rounded-2xl shadow-md border mb-6">
+    <div class="border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6 rounded-2xl shadow-md border mb-6">
 
       <h2 class="text-xl font-bold mb-4 dark:text-white/90">
         Nuevo Servidor
