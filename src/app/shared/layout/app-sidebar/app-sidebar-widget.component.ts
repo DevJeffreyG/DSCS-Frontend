@@ -13,8 +13,8 @@ import { Component } from '@angular/core';
           </p>
 
           <p class="mt-1 text-xs text-gray-500">
-            Monitoreo de Servidores
-          </p>
+            Monitoreo de Servidores.<br />Basado en TailAdmin.
+          </p> 
         </div>
 
       </div>
