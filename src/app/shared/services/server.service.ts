@@ -4,36 +4,53 @@ import { Server } from '../interfaces/server';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 
 import { AlertManagerService } from './alert-manager.service';
+import { HttpClient } from '@angular/common/http';
+import { ApiHelper } from '../../core/apihelper';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerService implements OnDestroy {
 
-  constructor(private alertManager: AlertManagerService) { }
+  constructor(private alertManager: AlertManagerService, private http: HttpClient) { }
 
   async getAllServers(): Promise<Server[]> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      resolve(this.dummyServers);
+    return new Promise((resolve, reject) => {
+      this.http.get<Server[]>(ApiHelper.getEndpoint('allServers'))
+        .subscribe({
+          next: (resp) => {
+            try {
+              resolve(resp);
+            } catch (error) {
+              console.error('❌ Error obteniendo servidores:', error);
+              resolve([]);
+            }
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
   async getServerById(id: number): Promise<Server | undefined> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      const server = this.dummyServers.find(
-        s => s.id === id
-      );
-      resolve(server);
+    return new Promise((resolve, reject) => {
+      this.http.get<Server>(ApiHelper.getEndpoint('serverById', { serverid: id }))
+        .subscribe({
+          next: (resp) => resolve(resp),
+          error: (error) => reject(error)
+        });
     });
   }
 
   async addServer(server: Server): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      this.dummyServers.push(server);
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.post<void>(ApiHelper.getEndpoint('addServer'), server)
+        .subscribe({
+          next: () => resolve(),
+          error: (error) => reject(error)
+        });
     });
   }
 
@@ -41,12 +58,12 @@ export class ServerService implements OnDestroy {
 
   async deleteServer(id: number): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      this.dummyServers = this.dummyServers.filter(
-        s => s.id !== id
-      );
-
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(ApiHelper.getEndpoint('deleteServer', { serverid: id }))
+        .subscribe({
+          next: () => resolve(),
+          error: (error) => reject(error)
+        });
     });
   }
 
@@ -54,16 +71,12 @@ export class ServerService implements OnDestroy {
 
   async updateServer(updatedServer: Server): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      const index = this.dummyServers.findIndex(
-        s => s.id === updatedServer.id
-      );
-
-      if (index !== -1) {
-        this.dummyServers[index] = updatedServer;
-      }
-
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.patch<void>(ApiHelper.getEndpoint('updateServer', { serverid: updatedServer.id }), updatedServer)
+        .subscribe({
+          next: () => resolve(),
+          error: (error) => reject(error)
+        });
     });
 
   }
@@ -72,23 +85,33 @@ export class ServerService implements OnDestroy {
 
   async getServerUsage(serverId: number): Promise<{ cpu: number; ram: number; disco: number; red: number; }> {
     return new Promise((resolve) => {
-      this.getServerById(serverId).then(server => {
-        if (server) {
-          resolve({
-            cpu: server.cpu,
-            ram: server.ram,
-            disco: server.disco,
-            red: server.red
-          });
-        } else {
-          resolve({
-            cpu: 0,
-            ram: 0,
-            disco: 0,
-            red: 0
-          });
-        }
-      });
+      try {
+        this.getServerById(serverId).then(server => {
+          if (server) {
+            resolve({
+              cpu: server.cpu,
+              ram: server.ram,
+              disco: server.disco,
+              red: server.red
+            });
+          } else {
+            resolve({
+              cpu: 0,
+              ram: 0,
+              disco: 0,
+              red: 0
+            });
+          }
+        });
+      } catch (error) {
+        console.error(`❌ Error obteniendo uso del servidor ${serverId}:`, error);
+        resolve({
+          cpu: 0,
+          ram: 0,
+          disco: 0,
+          red: 0
+        });
+      }
     })
   }
 

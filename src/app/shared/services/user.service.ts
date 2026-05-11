@@ -2,118 +2,100 @@ import { Injectable } from '@angular/core';
 import { User } from '../interfaces/user';
 import { UserRole } from '../enums/user-role';
 import { LoggeduserService } from './loggeduser.service';
+import { HttpClient } from '@angular/common/http';
+import { ApiHelper } from '../../core/apihelper';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
+  constructor(private http: HttpClient) { }
 
   // =====================================
   // GET USERS
   // =====================================
   async getUsers(): Promise<User[]> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      resolve(this.dummyUsers);
+    return new Promise((resolve, reject) => {
+      this.http.get<User[]>(ApiHelper.getEndpoint('allUsers'))
+        .subscribe({
+          next: (resp) => {
+            resolve(resp);
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
   async addUser(user: User): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      this.dummyUsers.push(user);
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.post<void>(ApiHelper.getEndpoint('addUser'), user)
+        .subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
-  async getUserById(
-    id: number
-  ): Promise<User | undefined> {
+  async getUserById(id: number): Promise<User | undefined> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      const user =
-        this.dummyUsers.find(
-          u => u.id_usuario === id
-        );
-
-      resolve(user);
+    return new Promise((resolve, reject) => {
+      this.http.get<User>(ApiHelper.getEndpoint('userById', { userid: id }))
+        .subscribe({
+          next: (resp) => {
+            resolve(resp);
+          },
+          error: (error) => reject(error)
+        });
     });
-
   }
 
-  async updateUser(
-    id: number,
-    updatedUser: User
-  ): Promise<void> {
+  async updateUser(id: number, updatedUser: User): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-
-      const index =
-        this.dummyUsers.findIndex(
-          u => u.id_usuario === id
-        );
-
-      if (index !== -1) {
-
-        this.dummyUsers[index] =
-          updatedUser;
-
-      }
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(ApiHelper.getEndpoint('updateUser', { userid: id }), updatedUser)
+        .subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => reject(error)
+        });
     });
-
   }
 
   async deleteUser(
     id: number
   ): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-    this.dummyUsers =
-      this.dummyUsers.filter(
-        u => u.id_usuario !== id
-      );
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(ApiHelper.getEndpoint('deleteUser', { userid: id }))
+        .subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
-  async login(
-    correo: string,
-    contraseña: string
-  ): Promise<User | null> {
+  async login(correo: string, contraseña: string): Promise<User | null> {
     // TODO: API CALL
     return new Promise((resolve, reject) => {
-
-      const user =
-        this.dummyUsers.find(
-          u =>
-            u.correo === correo &&
-            u.contraseña === contraseña
-        );
-
-      if (!user) {
-
-        reject(
-          new Error(
-            'Correo o contraseña incorrectos'
-          )
-        );
-
-        return;
-
-      }
-
-      LoggeduserService.setUser(user);
-
-      localStorage.setItem(
-        'auth',
-        'true'
-      );
-
-      resolve(user);
-
+      this.http.get<User>(ApiHelper.getEndpoint('auth'), { params: { correo, contraseña } })
+        .subscribe({
+          next: (user) => {
+            LoggeduserService.setUser(user);
+            localStorage.setItem('auth', 'true');
+            resolve(user);
+          },
+          error: (error) => {
+            reject(error);
+          }
+        });
     });
-
   }
 
   private dummyUsers: User[] = [

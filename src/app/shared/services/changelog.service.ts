@@ -3,6 +3,8 @@ import { Changelog } from '../interfaces/changelog';
 import { ChangelogType } from '../enums/changelog-type';
 import { UserRole } from '../enums/user-role';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ApiHelper } from '../../core/apihelper';
 
 @Injectable({
   providedIn: 'root',
@@ -13,17 +15,32 @@ export class ChangelogService {
 
   async getChangelogs(): Promise<Changelog[]> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      resolve(this.getSortedChangelogs());
+    return new Promise((resolve, reject) => {
+      this.http.get<Changelog[]>(ApiHelper.getEndpoint('allChangelogs'))
+        .subscribe({
+          next: (resp) => {
+            try {
+              resolve(resp);
+            } catch (error) {
+              console.error('❌ Error obteniendo changelogs:', error);
+              resolve([]);
+            }
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
   async newChangelog(changelog: Changelog): Promise<void> {
     // TODO: API CALL
-    return new Promise((resolve) => {
-      this.dummyChangelogs.push(changelog);
-      this.changelogSubject.next(this.getSortedChangelogs());
-      resolve();
+    return new Promise((resolve, reject) => {
+      this.http.post<void>(ApiHelper.getEndpoint('newChangelog'), changelog)
+        .subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => reject(error)
+        });
     });
   }
 
@@ -75,7 +92,7 @@ export class ChangelogService {
     }
   ]
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.changelogSubject.next(this.getSortedChangelogs());
   }
 

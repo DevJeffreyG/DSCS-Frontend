@@ -120,9 +120,7 @@ export class UsageChartComponent implements OnInit {
           default:
             value = 0;
         }
-
-        value = Math.round(value * Math.random() * 0.1 + value * 0.95); // TODO: QUITAR ESTO DESPUES. Simula pequeñas fluctuaciones
-
+        
         // Determina el índice de umbral actual
         let currentIndex = 0;
         for (let i = this.thresholds.length - 1; i >= 0; i--) {

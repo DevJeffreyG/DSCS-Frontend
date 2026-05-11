@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
 import { io, Socket } from 'socket.io-client';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
+import { ApiHelper } from '../../core/apihelper';
 
 @Injectable({
   providedIn: 'root',
@@ -17,14 +18,13 @@ export class AlertListenerService implements OnDestroy {
   public connected$ = this.connectionStatusSubject.asObservable();
 
   private serverListeners = new Map<number, Subject<ServerAlert>>();
-  private backendUrl = 'http://localhost:3000'; // TODO: cambiar segun backend
 
   constructor(private http: HttpClient) {
     this.initializeWebSocket();
   }
 
   private initializeWebSocket() {
-    this.socket = io(this.backendUrl, {
+    this.socket = io(ApiHelper.ROOT, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
@@ -88,7 +88,7 @@ export class AlertListenerService implements OnDestroy {
       params = params.set('resueltas', filters.resueltas.toString());
     }
 
-    const url = `${this.backendUrl}/api/servers/${serverId}/alerts`;
+    const url = ApiHelper.getEndpoint('alertsByServer', { serverid: serverId });
     console.log(`📥 Obteniendo alertas históricas de ${url}`, { filters });
 
     return this.http.get<ServerAlert[]>(url, {
@@ -140,7 +140,7 @@ export class AlertListenerService implements OnDestroy {
    * Marcar una alerta como resuelta
    */
   resolveAlert(alertId: string): Observable<void> {
-    return this.http.patch<void>(`${this.backendUrl}/api/alerts/${alertId}`, {
+    return this.http.patch<void>(ApiHelper.getEndpoint('resolveAlert', { alertid: alertId }), {
       resuelto: true,
       resueltoEn: new Date(),
     });
@@ -150,7 +150,7 @@ export class AlertListenerService implements OnDestroy {
    * Obtener estadísticas de alertas
    */
   getAlertStats(serverId: number): Observable<AlertStats> {
-    return this.http.get<AlertStats>(`${this.backendUrl}/api/servers/${serverId}/alerts/stats`);
+    return this.http.get<AlertStats>(ApiHelper.getEndpoint('alertStats', { serverid: serverId }));
   }
 
   /**
