@@ -13,6 +13,12 @@ export class ChangelogService {
   private changelogSubject = new BehaviorSubject<Changelog[]>([]);
   changelogs$ = this.changelogSubject.asObservable();
 
+  constructor(private http: HttpClient) {
+    this.syncChangelogs().catch(error => {
+      console.error('❌ Error sincronizando changelogs al iniciar el servicio:', error);
+    });
+  }
+
   async getChangelogs(): Promise<Changelog[]> {
     // TODO: API CALL
     return new Promise((resolve, reject) => {
@@ -37,11 +43,32 @@ export class ChangelogService {
       this.http.post<void>(ApiHelper.getEndpoint('newChangelog'), changelog)
         .subscribe({
           next: () => {
+            this.syncChangelogs().catch(error => {
+              console.error('❌ Error sincronizando changelogs después de agregar uno nuevo:', error);
+            });
+
             resolve();
           },
           error: (error) => reject(error)
         });
     });
+  }
+
+  private async syncChangelogs() {
+    try {
+      const sorted = await this.getSortedChangelogs();
+      this.changelogSubject.next(sorted);
+    } catch (error) {
+      console.error('❌ Error sincronizando changelogs:', error);
+      this.changelogSubject.next([]);
+    }
+  }
+
+  private async getSortedChangelogs(): Promise<Changelog[]> {
+    const changelogs = await this.getChangelogs();
+    return changelogs.sort(
+      (left, right) => right.fecha.getTime() - left.fecha.getTime()
+    );
   }
 
   private dummyChangelogs: Changelog[] = [
@@ -91,14 +118,4 @@ export class ChangelogService {
       id_usuario: 1
     }
   ]
-
-  constructor(private http: HttpClient) {
-    this.changelogSubject.next(this.getSortedChangelogs());
-  }
-
-  private getSortedChangelogs(): Changelog[] {
-    return [...this.dummyChangelogs].sort(
-      (left, right) => right.fecha.getTime() - left.fecha.getTime()
-    );
-  }
 }
