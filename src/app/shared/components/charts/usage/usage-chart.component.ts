@@ -102,60 +102,61 @@ export class UsageChartComponent implements OnInit {
     }
 
     setInterval(() => {
-      this.serverService.getServerUsage(this.serverId ?? 0).then(usage => {
-        let value = 0;
-        switch (this.usageType) {
-          case MonitorType.CPU:
-            value = usage.cpu;
-            break;
-          case MonitorType.RAM:
-            value = usage.ram;
-            break;
-          case MonitorType.DISK:
-            value = usage.disco;
-            break;
-          case MonitorType.NET:
-            value = usage.red;
-            break;
-          default:
-            value = 0;
-        }
-        
-        // Determina el índice de umbral actual
-        let currentIndex = 0;
-        for (let i = this.thresholds.length - 1; i >= 0; i--) {
-          if (value >= this.thresholds[i].value) {
-            currentIndex = i;
-            break;
+      if (this.serverId)
+        this.serverService.getServerUsage(this.serverId).then(usage => {
+          let value = 0;
+          switch (this.usageType) {
+            case MonitorType.CPU:
+              value = usage.cpu;
+              break;
+            case MonitorType.RAM:
+              value = usage.ram;
+              break;
+            case MonitorType.DISK:
+              value = usage.disco;
+              break;
+            case MonitorType.NET:
+              value = usage.red;
+              break;
+            default:
+              value = 0;
           }
-        }
-        // Solo actualiza el color si el índice cambió, sin tocar la serie
-        if (currentIndex !== this.lastThresholdIndex) {
-          const threshold = this.thresholds[currentIndex];
-          // Asegura que los arrays existan antes de asignar
-          if (Array.isArray(this.fill.colors) && this.fill.colors.length > 0) {
-            this.fill.colors[0] = threshold.color;
-          } else {
-            this.fill.colors = [threshold.color];
-          }
-          if (Array.isArray(this.colors) && this.colors.length > 0) {
-            this.colors[0] = threshold.color;
-          } else {
-            this.colors = [threshold.color];
-          }
-          this.lastThresholdIndex = currentIndex;
-        }
 
-        this.changePercentage(value);
-      });
+          // Determina el índice de umbral actual
+          let currentIndex = 0;
+          for (let i = this.thresholds.length - 1; i >= 0; i--) {
+            if (value >= this.thresholds[i].value) {
+              currentIndex = i;
+              break;
+            }
+          }
+          // Solo actualiza el color si el índice cambió, sin tocar la serie
+          if (currentIndex !== this.lastThresholdIndex) {
+            const threshold = this.thresholds[currentIndex];
+            // Asegura que los arrays existan antes de asignar
+            if (Array.isArray(this.fill.colors) && this.fill.colors.length > 0) {
+              this.fill.colors[0] = threshold.color;
+            } else {
+              this.fill.colors = [threshold.color];
+            }
+            if (Array.isArray(this.colors) && this.colors.length > 0) {
+              this.colors[0] = threshold.color;
+            } else {
+              this.colors = [threshold.color];
+            }
+            this.lastThresholdIndex = currentIndex;
+          }
+
+          this.changePercentage(value);
+        });
     }, 1000); // Update every second
   }
 
   changePercentage(newValue: number) {
-    if(newValue > 100) newValue = 100;
-    if(newValue < 0) newValue = 0;
+    if (newValue > 100) newValue = 100;
+    if (newValue < 0) newValue = 0;
 
-    if(newValue == this.usageNumber[0]) return;
+    if (newValue == this.usageNumber[0]) return;
     this.usageNumber = [newValue];
   }
 

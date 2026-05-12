@@ -21,6 +21,7 @@ export class ServerService implements OnDestroy {
         .subscribe({
           next: (resp) => {
             try {
+              console.log(resp);
               resolve(resp);
             } catch (error) {
               console.error('❌ Error obteniendo servidores:', error);
@@ -81,20 +82,13 @@ export class ServerService implements OnDestroy {
 
   }
 
-
-
   async getServerUsage(serverId: number): Promise<{ cpu: number; ram: number; disco: number; red: number; }> {
     return new Promise((resolve) => {
-      try {
-        this.getServerById(serverId).then(server => {
-          if (server) {
-            resolve({
-              cpu: server.cpu,
-              ram: server.ram,
-              disco: server.disco,
-              red: server.red
-            });
-          } else {
+      this.http.get<{ cpu: number; ram: number; disco: number; red: number; }>(ApiHelper.getEndpoint('getServerUsage', { serverid: serverId }))
+        .subscribe({
+          next: (resp) => resolve(resp),
+          error: (error) => {
+            console.error(`❌ Error obteniendo uso del servidor ${serverId}:`, error);
             resolve({
               cpu: 0,
               ram: 0,
@@ -102,16 +96,7 @@ export class ServerService implements OnDestroy {
               red: 0
             });
           }
-        });
-      } catch (error) {
-        console.error(`❌ Error obteniendo uso del servidor ${serverId}:`, error);
-        resolve({
-          cpu: 0,
-          ram: 0,
-          disco: 0,
-          red: 0
-        });
-      }
+        })
     })
   }
 

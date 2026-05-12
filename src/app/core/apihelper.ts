@@ -1,29 +1,30 @@
 export class ApiHelper {
     static readonly ROOT = 'http://localhost:3000';
     static readonly ENDPOINTS = {
-        alertsByServer: `${ApiHelper.ROOT}/api/servers/:serverid/alerts`,
-        resolveAlert: `${ApiHelper.ROOT}/api/alerts/:alertid`,
-        alertStats: `${ApiHelper.ROOT}/api/servers/:serverid/alerts/stats`,
+        alertsByServer: `${ApiHelper.ROOT}/api/servers/:serverid/alerts`, // done
+        getActiveAlerts: `${ApiHelper.ROOT}/api/servers/:serverid/alerts/active`, // done
+        resolveAlert: `${ApiHelper.ROOT}/api/alerts/:id/resolve`, // done
         
-        allServers: `${ApiHelper.ROOT}/api/servers`,
-        serverById: `${ApiHelper.ROOT}/api/servers/:serverid`,
-        addServer: `${ApiHelper.ROOT}/api/servers`,
-        deleteServer: `${ApiHelper.ROOT}/api/servers/:serverid`,
-        updateServer: `${ApiHelper.ROOT}/api/servers/:serverid`,
+        allServers: `${ApiHelper.ROOT}/api/servers`, // done
+        serverById: `${ApiHelper.ROOT}/api/servers/:serverid`, // TODO: realizable desde front?
+        addServer: `${ApiHelper.ROOT}/api/servers`, // done
+        deleteServer: `${ApiHelper.ROOT}/api/servers/:serverid`, // TODO: se puede hacer?
+        updateServer: `${ApiHelper.ROOT}/api/servers/:serverid`, // TODO: se puede hacer?
+        getServerUsage: `${ApiHelper.ROOT}/api/servers/:serverid/usage`, // done ; TODO: se va a usar el monitoreo, o esto?
 
-        allChangelogs: `${ApiHelper.ROOT}/api/changelogs`,
-        newChangelog: `${ApiHelper.ROOT}/api/changelogs`,
+        allChangelogs: `${ApiHelper.ROOT}/api/changelog`, // done
+        newChangelog: `${ApiHelper.ROOT}/api/changelogs`, // TODO: FALTA
 
-        getConfig: `${ApiHelper.ROOT}/api/config`,
-        saveConfig: `${ApiHelper.ROOT}/api/config`,
+        getConfig: `${ApiHelper.ROOT}/api/config`, // done
+        saveConfig: `${ApiHelper.ROOT}/api/config`, // done
 
-        allUsers: `${ApiHelper.ROOT}/api/users`,
-        userById: `${ApiHelper.ROOT}/api/users/:userid`,
-        addUser: `${ApiHelper.ROOT}/api/users`,
-        deleteUser: `${ApiHelper.ROOT}/api/users/:userid`,
-        updateUser: `${ApiHelper.ROOT}/api/users/:userid`,
+        allUsers: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
+        userById: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: realizable desde el front?, si existe allUsers
+        addUser: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
+        deleteUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
+        updateUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
 
-        auth: `${ApiHelper.ROOT}/api/auth/login`
+        auth: `${ApiHelper.ROOT}/api/auth/login` // done, falta implementacion
     };
 
     public static getEndpoint(key: keyof typeof ApiHelper.ENDPOINTS, params?: { [key: string]: any }): string {

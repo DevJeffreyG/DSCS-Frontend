@@ -86,7 +86,7 @@ export class ConfigComponent {
   }
 
   saveConfiguration() {
-    if(this.cpuThreshold === this.config.cpuThreshold && this.ramThreshold === this.config.ramThreshold && this.monitoringInterval === this.config.monitoringInterval) {
+    if (this.cpuThreshold === this.config.cpuThreshold && this.ramThreshold === this.config.ramThreshold && this.monitoringInterval === this.config.monitoringInterval) {
       // No changes to save
       this.saveError = true;
       this.errorMessage = 'No se han realizado cambios en la configuración.';
@@ -104,44 +104,60 @@ export class ConfigComponent {
     }).then(() => {
       let user = LoggeduserService.getUser();
       console.log(user);
-      if (this.config.cpuThreshold != this.cpuThreshold) {
-        this.changelogService.newChangelog({
-          id: Date.now(),
-          descripcion: `Se actualizó el umbral de CPU a ${this.cpuThreshold}%`,
-          tipo: ChangelogType.CPU,
-          old: { cpuThreshold: this.config.cpuThreshold },
-          new: { cpuThreshold: this.cpuThreshold },
-          fecha: new Date(),
-          id_usuario: LoggeduserService.getUser().id_usuario
-        });
+      try {
+        if (this.config.cpuThreshold != this.cpuThreshold) {
+          this.changelogService.newChangelog({
+            id: Date.now(),
+            descripcion: `Se actualizó el umbral de CPU a ${this.cpuThreshold}%`,
+            tipo: ChangelogType.CPU,
+            old: { cpuThreshold: this.config.cpuThreshold },
+            new: { cpuThreshold: this.cpuThreshold },
+            fecha: new Date(),
+            id_usuario: LoggeduserService.getUser().id_usuario
+          });
+        }
+
+        if (this.config.ramThreshold != this.ramThreshold) {
+          this.changelogService.newChangelog({
+            id: Date.now(),
+            descripcion: `Se actualizó el umbral de RAM a ${this.ramThreshold}%`,
+            tipo: ChangelogType.RAM,
+            old: { ramThreshold: this.config.ramThreshold },
+            new: { ramThreshold: this.ramThreshold },
+            fecha: new Date(),
+            id_usuario: LoggeduserService.getUser().id_usuario
+          });
+        }
+
+        if (this.config.monitoringInterval != this.monitoringInterval) {
+          this.changelogService.newChangelog({
+            id: Date.now(),
+            descripcion: `Se actualizó el intervalo de monitoreo a ${this.monitoringInterval} segundos.`,
+            tipo: ChangelogType.MONITORING_INTERVAL,
+            old: { monitoringInterval: this.config.monitoringInterval },
+            new: { monitoringInterval: this.monitoringInterval },
+            fecha: new Date(),
+            id_usuario: LoggeduserService.getUser().id_usuario
+          });
+        }
+      } catch (error) {
+        console.error('Error creando changelog:', error);
+
+        setTimeout(() => {
+          this.saveError = true;
+          this.errorMessage = 'Ocurrió un error al crear el changelog.';
+        }, 15000)
       }
 
-      if (this.config.ramThreshold != this.ramThreshold) {
-        this.changelogService.newChangelog({
-          id: Date.now(),
-          descripcion: `Se actualizó el umbral de RAM a ${this.ramThreshold}%`,
-          tipo: ChangelogType.RAM,
-          old: { ramThreshold: this.config.ramThreshold },
-          new: { ramThreshold: this.ramThreshold },
-          fecha: new Date(),
-          id_usuario: LoggeduserService.getUser().id_usuario
-        });
-      }
-
-      if(this.config.monitoringInterval != this.monitoringInterval) {
-        this.changelogService.newChangelog({
-          id: Date.now(),
-          descripcion: `Se actualizó el intervalo de monitoreo a ${this.monitoringInterval} segundos.`,
-          tipo: ChangelogType.MONITORING_INTERVAL,
-          old: { monitoringInterval: this.config.monitoringInterval },
-          new: { monitoringInterval: this.monitoringInterval },
-          fecha: new Date(),
-          id_usuario: LoggeduserService.getUser().id_usuario
-        });
-      }
 
       this.saveSuccess = true;
       this.successMessage = 'La configuración se ha guardado exitosamente.';
+
+      this.config = {
+        cpuThreshold: this.cpuThreshold,
+        ramThreshold: this.ramThreshold,
+        monitoringInterval: this.monitoringInterval
+      }
 
       setInterval(() => {
         this.saveSuccess = false;

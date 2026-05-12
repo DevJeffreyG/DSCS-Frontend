@@ -23,7 +23,6 @@
 - [AlertListenerService](https://github.com/DevJeffreyG/DSCS-Frontend/blob/b6944ec283386f796bdd23341e3e07742fc936e1/src/app/shared/services/alert-listener.service.ts#L11)
   - getHistoricalAlerts(serverId, [filters](https://github.com/DevJeffreyG/DSCS-Frontend/blob/7dd74b08c3898e35f8a15e9da041e45c157f89ed/src/app/shared/interfaces/alert.ts#L21)): [serveralerts[]](https://github.com/DevJeffreyG/DSCS-Frontend/blob/7dd74b08c3898e35f8a15e9da041e45c157f89ed/src/app/shared/interfaces/alert.ts#L1)
   - resolveAlert(alertId): void
-  - getAlertStats(serverId): [alertstats](https://github.com/DevJeffreyG/DSCS-Frontend/blob/7dd74b08c3898e35f8a15e9da041e45c157f89ed/src/app/shared/interfaces/alert.ts#L30)
 </details>
 
 ## Installation

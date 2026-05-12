@@ -25,7 +25,7 @@ export class ConfigService {
   async saveConfig(config: Config) {
     // TODO: API CALL
     return new Promise<void>((resolve, reject) => {
-      this.http.post<void>(ApiHelper.getEndpoint('saveConfig'), config)
+      this.http.put<void>(ApiHelper.getEndpoint('saveConfig'), config)
         .subscribe({
           next: () => {
             resolve();

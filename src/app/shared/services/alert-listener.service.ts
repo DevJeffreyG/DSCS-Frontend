@@ -99,11 +99,7 @@ export class AlertListenerService implements OnDestroy {
           console.log(`✅ Recibidas ${alerts.length} alertas históricas del servidor ${serverId}`, alerts);
         }),
         map((alerts) =>
-          alerts.map((alert) => ({
-            ...alert,
-            timestamp: new Date(alert.timestamp),
-            resueltoEn: alert.resueltoEn ? new Date(alert.resueltoEn) : undefined,
-          }))
+          alerts.map((alert) => ({...alert}))
         )
       );
   }
@@ -113,9 +109,17 @@ export class AlertListenerService implements OnDestroy {
    */
   getActiveAlerts(serverId: number): Observable<ServerAlert[]> {
     console.log(`🔴 Obteniendo alertas activas para servidor ${serverId}`);
-    return this.getHistoricalAlerts(serverId, { resueltas: false });
+    return this.http.get<ServerAlert[]>(ApiHelper.getEndpoint('getActiveAlerts', { serverid: serverId }))
+      .pipe(
+        tap((alerts) => {
+          console.log(`✅ Recibidas ${alerts.length} alertas activas del servidor ${serverId}`, alerts);
+        }),
+        map((alerts) =>
+          alerts.map((alert) => ({...alert}))
+        )
+      );
   }
-
+  
   /**
    * Suscribirse a alertas en tiempo real de un servidor específico
    */
@@ -144,13 +148,6 @@ export class AlertListenerService implements OnDestroy {
       resuelto: true,
       resueltoEn: new Date(),
     });
-  }
-
-  /**
-   * Obtener estadísticas de alertas
-   */
-  getAlertStats(serverId: number): Observable<AlertStats> {
-    return this.http.get<AlertStats>(ApiHelper.getEndpoint('alertStats', { serverid: serverId }));
   }
 
   /**
