@@ -92,14 +92,14 @@ export class AlertListenerService implements OnDestroy {
     console.log(`📥 Obteniendo alertas históricas de ${url}`, { filters });
 
     return this.http.get<ServerAlert[]>(url, {
-        params,
-      })
+      params,
+    })
       .pipe(
         tap((alerts) => {
           console.log(`✅ Recibidas ${alerts.length} alertas históricas del servidor ${serverId}`, alerts);
         }),
         map((alerts) =>
-          alerts.map((alert) => ({...alert}))
+          alerts.map((alert) => ({ ...alert }))
         )
       );
   }
@@ -115,11 +115,11 @@ export class AlertListenerService implements OnDestroy {
           console.log(`✅ Recibidas ${alerts.length} alertas activas del servidor ${serverId}`, alerts);
         }),
         map((alerts) =>
-          alerts.map((alert) => ({...alert}))
+          alerts.map((alert) => ({ ...alert }))
         )
       );
   }
-  
+
   /**
    * Suscribirse a alertas en tiempo real de un servidor específico
    */
@@ -144,10 +144,15 @@ export class AlertListenerService implements OnDestroy {
    * Marcar una alerta como resuelta
    */
   resolveAlert(alertId: string): Observable<void> {
-    return this.http.patch<void>(ApiHelper.getEndpoint('resolveAlert', { alertid: alertId }), {
+    return this.http.patch<void>(ApiHelper.getEndpoint('resolveAlert', { id: alertId }), {
       resuelto: true,
-      resueltoEn: new Date(),
-    });
+      resueltoEn: new Date()
+    })
+      .pipe(
+        tap(() => {
+          console.log(`✅ Alerta ${alertId} marcada como resuelta`);
+        })
+      );
   }
 
   /**
