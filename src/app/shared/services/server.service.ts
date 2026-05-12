@@ -33,17 +33,6 @@ export class ServerService implements OnDestroy {
     });
   }
 
-  async getServerById(id: number): Promise<Server | undefined> {
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      this.http.get<Server>(ApiHelper.getEndpoint('serverById', { serverid: id }))
-        .subscribe({
-          next: (resp) => resolve(resp),
-          error: (error) => reject(error)
-        });
-    });
-  }
-
   async addServer(server: Server): Promise<void> {
     // TODO: API CALL
     return new Promise((resolve, reject) => {
@@ -54,34 +43,7 @@ export class ServerService implements OnDestroy {
         });
     });
   }
-
-
-
-  async deleteServer(id: number): Promise<void> {
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      this.http.delete<void>(ApiHelper.getEndpoint('deleteServer', { serverid: id }))
-        .subscribe({
-          next: () => resolve(),
-          error: (error) => reject(error)
-        });
-    });
-  }
-
-
-
-  async updateServer(updatedServer: Server): Promise<void> {
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      this.http.patch<void>(ApiHelper.getEndpoint('updateServer', { serverid: updatedServer.id }), updatedServer)
-        .subscribe({
-          next: () => resolve(),
-          error: (error) => reject(error)
-        });
-    });
-
-  }
-
+  
   async getServerUsage(serverId: number): Promise<{ cpu: number; ram: number; disco: number; red: number; }> {
     return new Promise((resolve) => {
       this.http.get<{ cpu: number; ram: number; disco: number; red: number; }>(ApiHelper.getEndpoint('getServerUsage', { serverid: serverId }))

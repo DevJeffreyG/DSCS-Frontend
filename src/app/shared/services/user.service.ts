@@ -81,23 +81,6 @@ export class UserService {
     });
   }
 
-  async login(correo: string, contraseña: string): Promise<User | null> {
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      this.http.get<User>(ApiHelper.getEndpoint('auth'), { params: { correo, contraseña } })
-        .subscribe({
-          next: (user) => {
-            LoggeduserService.setUser(user);
-            localStorage.setItem('auth', 'true');
-            resolve(user);
-          },
-          error: (error) => {
-            reject(error);
-          }
-        });
-    });
-  }
-
   private dummyUsers: User[] = [
 
     {

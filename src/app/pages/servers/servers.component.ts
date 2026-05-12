@@ -43,18 +43,13 @@ export class ServersComponent {
   async ngOnInit() {
 
     // CARGAR SERVIDORES
-    this.servers =
-      await this.serverService.getAllServers();
+    this.servers = await this.serverService.getAllServers();
 
     // OBTENER USUARIO LOGUEADO
-    const user =
-      LoggeduserService.getUser();
+    const user = LoggeduserService.getUser();
 
     if (user) {
-
-      this.currentUserRole =
-        user.rol;
-
+      this.currentUserRole =user.rol;
     }
 
   }
@@ -80,7 +75,6 @@ export class ServersComponent {
 
   
   async addServer() {
-
     // BLOQUEAR OPERADOR
     if (this.isOperator()) {
       return;
@@ -91,31 +85,21 @@ export class ServersComponent {
     if (!this.newServer.ip) return;
 
     const server: Server = {
-
       id: Date.now(),
-
       nombre: this.newServer.nombre,
-
       ip: this.newServer.ip,
-
       estado: this.newServer.estado,
-
       cpu: Math.floor(Math.random() * 100),
-
       ram: Math.floor(Math.random() * 100),
-
       disco: Math.floor(Math.random() * 100),
-
       red: Math.floor(Math.random() * 100)
-
     };
 
     // GUARDAR
     await this.serverService.addServer(server);
 
     // ACTUALIZAR
-    this.servers =
-      await this.serverService.getAllServers();
+    this.servers = await this.serverService.getAllServers();
 
     // LIMPIAR
     this.newServer = {

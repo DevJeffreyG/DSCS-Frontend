@@ -36,4 +36,10 @@ export class LoggeduserService {
 
     return LoggeduserService.user || JSON.parse(localStorage.getItem('user') || '{}');
   }
+
+  public static signOut() {
+    LoggeduserService.user = null;
+    localStorage.removeItem('user');
+    localStorage.removeItem('auth');
+  }
 }

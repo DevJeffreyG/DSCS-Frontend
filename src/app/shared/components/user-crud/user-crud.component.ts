@@ -93,8 +93,7 @@ export class UserCrudComponent {
   // =====================================
   async ngOnInit() {
 
-    this.users =
-      await this.userService.getUsers();
+    this.users = await this.userService.getUsers();
 
   }
 

@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { UserService } from '../../../services/user.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-signin-form',
@@ -39,7 +40,8 @@ export class SigninFormComponent {
 
   constructor(
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {}
 
   togglePasswordVisibility() {
@@ -51,7 +53,7 @@ export class SigninFormComponent {
     this.loading = true;
 
     try {
-       await this.userService.login(
+       await this.authService.login(
         this.email,
         this.password
       );
