@@ -37,23 +37,6 @@ export class ChangelogService {
     });
   }
 
-  async newChangelog(changelog: Changelog): Promise<void> {
-    // TODO: API CALL
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(ApiHelper.getEndpoint('newChangelog'), changelog)
-        .subscribe({
-          next: () => {
-            this.syncChangelogs().catch(error => {
-              console.error('❌ Error sincronizando changelogs después de agregar uno nuevo:', error);
-            });
-
-            resolve();
-          },
-          error: (error) => reject(error)
-        });
-    });
-  }
-
   private async syncChangelogs() {
     try {
       const sorted = await this.getSortedChangelogs();

@@ -183,7 +183,7 @@ export class UserCrudComponent {
         await this.userService.getUsers();
 
       // CHANGELOG
-      this.changelogService.newChangelog({
+      /* this.changelogService.newChangelog({
 
         id: Date.now(),
 
@@ -202,7 +202,7 @@ export class UserCrudComponent {
         id_usuario:
           LoggeduserService.getUser().id_usuario
 
-      });
+      }); */
 
       // RESET
       this.editingUser = null;
@@ -238,7 +238,7 @@ export class UserCrudComponent {
         await this.userService.getUsers();
 
       // CHANGELOG
-      this.changelogService.newChangelog({
+      /* this.changelogService.newChangelog({
 
         id: Date.now(),
 
@@ -257,7 +257,7 @@ export class UserCrudComponent {
         id_usuario:
           LoggeduserService.getUser().id_usuario
 
-      });
+      }); */
 
     }
 
@@ -320,7 +320,7 @@ export class UserCrudComponent {
       await this.userService.getUsers();
 
     // CHANGELOG
-    this.changelogService.newChangelog({
+    /* this.changelogService.newChangelog({
 
       id: Date.now(),
 
@@ -339,7 +339,7 @@ export class UserCrudComponent {
       id_usuario:
         LoggeduserService.getUser().id_usuario
 
-    });
+    }); */
 
   }
 

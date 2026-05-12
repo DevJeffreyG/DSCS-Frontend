@@ -13,7 +13,6 @@ export class ApiHelper {
         getServerUsage: `${ApiHelper.ROOT}/api/servers/:serverid/usage`, // done ; TODO: se va a usar el monitoreo, o esto?
 
         allChangelogs: `${ApiHelper.ROOT}/api/changelog`, // done
-        newChangelog: `${ApiHelper.ROOT}/api/changelogs`, // TODO: FALTA
 
         getConfig: `${ApiHelper.ROOT}/api/config`, // done
         saveConfig: `${ApiHelper.ROOT}/api/config`, // done
