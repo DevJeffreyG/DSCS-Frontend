@@ -10,30 +10,34 @@ import { LoggeduserService } from './loggeduser.service';
 export class AuthService {
   constructor(private http: HttpClient) { }
 
-  async validateToken(token: string): Promise<boolean> {
+  async validateToken(token: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.post<{ valid: boolean }>(ApiHelper.getEndpoint('validateToken'), { token })
+      this.http.get<any>(ApiHelper.getEndpoint('validateToken'), {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
         .subscribe({
-          next: (resp) => resolve(resp.valid),
-          error: (error) => resolve(true) // TODO: reject(error)
+          next: (resp) => resolve(resp),
+          error: (error) => reject(error)
         });
     });
   }
 
   async login(correo: string, contraseña: string): Promise<User | null> {
-      return new Promise((resolve, reject) => {
-        this.http.post<{ token: string, user: User }>(ApiHelper.getEndpoint('auth'), { correo, contraseña })
-          .subscribe({
-            next: (r) => {
-              const user = r.user;
-              LoggeduserService.setUser(user);
-              localStorage.setItem('auth', r.token);
-              resolve(user);
-            },
-            error: (error) => {
-              reject(error);
-            }
-          });
-      });
-    }
+    return new Promise((resolve, reject) => {
+      this.http.post<{ token: string, user: User }>(ApiHelper.getEndpoint('auth'), { correo, contraseña })
+        .subscribe({
+          next: (r) => {
+            const user = r.user;
+            LoggeduserService.setUser(user);
+            localStorage.setItem('auth', r.token);
+            resolve(user);
+          },
+          error: (error) => {
+            reject(error);
+          }
+        });
+    });
+  }
 }

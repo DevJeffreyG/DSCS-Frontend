@@ -7,3 +7,10 @@ export interface User {
     contraseña: string;
     rol: UserRole;
 }
+
+export interface UserPublic {
+    id_usuario: number;
+    nombre: string;
+    correo: string;
+    rol: UserRole;
+}

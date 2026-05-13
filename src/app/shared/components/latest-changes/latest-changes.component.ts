@@ -4,7 +4,7 @@ import { Changelog } from '../../interfaces/changelog';
 import { ChangelogService } from '../../services/changelog.service';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../services/user.service';
-import { User } from '../../interfaces/user';
+import { User, UserPublic } from '../../interfaces/user';
 
 @Component({
   selector: 'app-latest-changes',
@@ -16,7 +16,7 @@ import { User } from '../../interfaces/user';
 })
 export class LatestChangesComponent implements OnInit, OnDestroy {
   changelogs: Changelog[] = [];
-  users: User[] = [];
+  users: UserPublic[] = [];
   private subscription = new Subscription();
 
   constructor(private changelogService: ChangelogService, private userService: UserService) {}

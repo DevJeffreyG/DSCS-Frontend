@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { User } from '../../interfaces/user';
+import { User, UserPublic } from '../../interfaces/user';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { TableDropdownComponent } from '../common/table-dropdown/table-dropdown.component';
@@ -33,12 +33,12 @@ export class UserCrudComponent {
   // =====================================
   // USERS
   // =====================================
-  users: User[] = [];
+  users: UserPublic[] = [];
 
   // =====================================
   // EDITING USER
   // =====================================
-  editingUser: User | null = null;
+  editingUser: UserPublic | null = null;
 
   // =====================================
   // ENUM
@@ -94,6 +94,7 @@ export class UserCrudComponent {
   async ngOnInit() {
 
     this.users = await this.userService.getUsers();
+    console.log("!!!!!!!!!!", this.users);
 
   }
 
@@ -101,11 +102,14 @@ export class UserCrudComponent {
   // GET ROLE
   // =====================================
   getRole(role: number): string {
-
-    return UserRole[
-      role as unknown as keyof typeof UserRole
-    ].toString();
-
+    switch (role) {
+      case UserRole.Admin:
+        return 'Admin';
+      case UserRole.Operator:
+        return 'Operator';
+      default:
+        return 'Unknown';
+    }
   }
 
   // =====================================
@@ -279,9 +283,9 @@ export class UserCrudComponent {
   }
 
   // =====================================
-  // EDIT USER
+  // TODO: EDIT USER
   // =====================================
-  editUser(user: User) {
+  editUser(user: UserPublic) {
 
     // SAVE USER
     this.editingUser = { ...user };
@@ -293,9 +297,6 @@ export class UserCrudComponent {
     this.userEmail =
       user.correo;
 
-    this.userPassword =
-      user.contraseña;
-
     this.userRole =
       user.rol;
 
@@ -305,9 +306,9 @@ export class UserCrudComponent {
   }
 
   // =====================================
-  // DELETE USER
+  // TODO: DELETE USER
   // =====================================
-  async deleteUser(user: User) {
+  async deleteUser(user: UserPublic) {
 
     // DELETE
     await this.userService.deleteUser(

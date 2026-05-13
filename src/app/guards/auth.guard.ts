@@ -16,8 +16,8 @@ export const authGuard: CanActivateFn = (_, state) => {
   } else {
     return authService.validateToken(isLogged).then((isValid) => {
       if (!isValid) {
-        console.error('❌ Token inválido');
         LoggeduserService.signOut();
+        console.error('❌ Token inválido');
         router.navigate(['/signin']);
         return false;
       } else {
@@ -29,6 +29,11 @@ export const authGuard: CanActivateFn = (_, state) => {
 
         return true;
       }
+    }).catch((error) => {
+      LoggeduserService.signOut();
+      console.error('❌ Error al validar token:', error);
+      router.navigate(['/signin']);
+      return false;
     });
   }
 

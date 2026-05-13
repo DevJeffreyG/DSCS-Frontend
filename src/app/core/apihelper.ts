@@ -16,14 +16,14 @@ export class ApiHelper {
         getConfig: `${ApiHelper.ROOT}/api/config`,
         saveConfig: `${ApiHelper.ROOT}/api/config`,
 
-        allUsers: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
-        userById: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: realizable desde el front?, si existe allUsers
+        allUsers: `${ApiHelper.ROOT}/api/users`,
+        userById: `${ApiHelper.ROOT}/api/users/:userid`,
         addUser: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
         deleteUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
         updateUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
 
-        auth: `${ApiHelper.ROOT}/api/auth/login`, // done
-        validateToken: `${ApiHelper.ROOT}/api/auth/validate` // TODO: FALTA
+        auth: `${ApiHelper.ROOT}/api/auth/login`,
+        validateToken: `${ApiHelper.ROOT}/api/auth/me` 
     };
 
     public static getEndpoint(key: keyof typeof ApiHelper.ENDPOINTS, params?: { [key: string]: any }): string {
@@ -34,5 +34,15 @@ export class ApiHelper {
             }
         }
         return endpoint;
+    }
+
+    public static AuthorizedHeaders() {
+        const token = localStorage.getItem('auth');
+
+        return {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        };
     }
 }
