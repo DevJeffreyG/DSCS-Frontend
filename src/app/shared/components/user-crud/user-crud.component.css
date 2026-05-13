@@ -1,0 +1,18 @@
+/* Ensure dropdown content has proper z-index and positioning */
+:host {
+  display: block;
+}
+
+/* Allow dropdown to escape overflow from table container */
+::ng-deep td:last-child {
+  overflow: visible !important;
+  position: relative;
+}
+
+::ng-deep tbody {
+  overflow: visible !important;
+}
+
+::ng-deep tr {
+  overflow: visible !important;
+}

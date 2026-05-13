@@ -9,7 +9,7 @@
 
         <app-button
             size="sm"
-            (btnClick)="addUserModal()"
+            (btnClick)="startUserModal()"
         >
             + Nuevo usuario
         </app-button>
@@ -21,14 +21,14 @@
 
         <app-modal
             [isOpen]="addUserIsOpen"
-            (close)="closeAddUser()"
+            (close)="closeAddUserModal()"
             className="max-w-[584px] p-5 lg:p-10"
         >
 
             <form>
 
                 <h4 class="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">
-                    Nuevo usuario
+                    {{ editingUser ? 'Editar usuario' : 'Nuevo usuario' }}
                 </h4>
 
                 <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -69,7 +69,7 @@
                     <div class="col-span-1 sm:col-span-2">
 
                         <app-label>
-                            Contraseña
+                            {{ editingUser ? 'Nueva Contraseña' : 'Contraseña' }}
                         </app-label>
 
                         <app-input-field
@@ -94,6 +94,7 @@
                             [value]="userRole"
                             [defaultValue]="userRoles.Operator"
                             (valueChange)="handleRoleChange($event)"
+                            [disabled]="editingUser ? isSameUser(editingUser) : false"
                             className="dark:bg-dark-900"
                         />
 
@@ -107,7 +108,7 @@
                     <app-button
                         size="sm"
                         variant="outline"
-                        (btnClick)="closeAddUser()"
+                        (btnClick)="closeAddUserModal()"
                     >
                         Cerrar
                     </app-button>
@@ -128,7 +129,7 @@
     </div>
 
     <!-- TABLA -->
-    <div class="max-w-full overflow-x-auto">
+    <div class="max-w-full overflow-x-auto overflow-y-visible custom-scrollbar">
 
         <table class="min-w-full">
 
@@ -240,19 +241,21 @@
 
                                             <!-- EDITAR -->
                                             <button
-                                                (click)="editUser(user)"
+                                                (click)="startEditUser(user)"
                                                 class="text-xs flex w-full rounded-lg px-3 py-2 text-left font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                                             >
                                                 Editar
                                             </button>
 
                                             <!-- ELIMINAR -->
-                                            <button
-                                                (click)="deleteUser(user)"
-                                                class="text-xs flex w-full rounded-lg px-3 py-2 text-left font-medium text-red-500 hover:bg-red-100 hover:text-red-700"
-                                            >
-                                                Eliminar
-                                            </button>
+                                            @if(!isSameUser(user)){
+                                                <button
+                                                    (click)="deleteUser(user)"
+                                                    class="text-xs flex w-full rounded-lg px-3 py-2 text-left font-medium text-red-500 hover:bg-red-100 hover:text-red-700"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            }
 
                                         </div>
 

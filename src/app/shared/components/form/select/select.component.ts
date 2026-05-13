@@ -17,6 +17,7 @@ export class SelectComponent implements OnChanges, OnInit {
   @Input() className: string = '';
   @Input() defaultValue: any = '';
   @Input() value: any = '';
+  @Input() disabled: boolean = false;
 
   @Output() valueChange = new EventEmitter<any>();
 

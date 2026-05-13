@@ -36,6 +36,7 @@ export class TableDropdownComponent {
         this.contentRef.nativeElement,
         {
           placement: 'bottom-end',
+          strategy: 'fixed',
           modifiers: [
             {
               name: 'offset',
