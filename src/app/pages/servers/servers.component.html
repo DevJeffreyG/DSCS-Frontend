@@ -12,66 +12,7 @@
         Monitoreo en tiempo real de computadores y servidores
       </p>
     </div>
-
-    <!-- BOTON SOLO ADMIN -->
-    @if (!isOperator()) {
-
-      <button
-        class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
-        (click)="showForm = !showForm"
-      >
-        + Agregar Servidor
-      </button>
-
-    }
-
   </div>
-
-  <!-- FORMULARIO -->
-  @if (showForm && !isOperator()) {
-
-    <div class="border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6 rounded-2xl shadow-md border mb-6">
-
-      <h2 class="text-xl font-bold mb-4 dark:text-white/90">
-        Nuevo Servidor
-      </h2>
-
-      <!-- NOMBRE -->
-      <input
-        type="text"
-        placeholder="Nombre del servidor"
-        [(ngModel)]="newServer.nombre"
-        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
-      />
-
-      <!-- IP -->
-      <input
-        type="text"
-        placeholder="IP del servidor"
-        [(ngModel)]="newServer.ip"
-        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
-      />
-
-      <!-- ESTADO -->
-      <select
-        [(ngModel)]="newServer.estado"
-        class="w-full border p-3 rounded-xl mb-4 dark:bg-gray-900 dark:border-gray-800 dark:text-white"
-      >
-        <option value="Online">Online</option>
-        <option value="Offline">Offline</option>
-      </select>
-
-      <!-- GUARDAR -->
-      <button
-        class="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700"
-        (click)="addServer()"
-      >
-        Crear
-      </button>
-
-    </div>
-
-  }
 
   <!-- GRID -->
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -93,16 +34,6 @@
               {{ server.ip }}
             </p>
 
-          </div>
-
-          <div
-            class="px-3 py-1 rounded-full text-sm font-medium"
-            [class.bg-green-100]="server.estado === 'Online'"
-            [class.text-green-700]="server.estado === 'Online'"
-            [class.bg-red-100]="server.estado === 'Offline'"
-            [class.text-red-700]="server.estado === 'Offline'"
-          >
-            {{ server.estado }}
           </div>
 
         </div>
