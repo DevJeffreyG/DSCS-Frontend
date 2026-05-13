@@ -37,7 +37,7 @@ export class ChangelogService {
     });
   }
 
-  private async syncChangelogs() {
+  async syncChangelogs() {
     try {
       const sorted = await this.getSortedChangelogs();
       this.changelogSubject.next(sorted);
@@ -50,7 +50,7 @@ export class ChangelogService {
   private async getSortedChangelogs(): Promise<Changelog[]> {
     const changelogs = await this.getChangelogs();
     return changelogs.sort(
-      (left, right) => right.fecha.getTime() - left.fecha.getTime()
+      (left, right) => new Date(right.fecha).getTime() - new Date(left.fecha).getTime()
     );
   }
 
