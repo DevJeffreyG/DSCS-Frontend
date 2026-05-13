@@ -10,6 +10,7 @@ import { ModalComponent } from '../ui/modal/modal.component';
 import { Option, SelectComponent } from '../form/select/select.component';
 import { UserRole } from '../../enums/user-role';
 import { LoggeduserService } from '../../services/loggeduser.service';
+import { ChangelogService } from '../../services/changelog.service';
 
 @Component({
   selector: 'app-user-crud',
@@ -53,7 +54,8 @@ export class UserCrudComponent {
   addUserIsOpen = false;
 
   constructor(
-    private userService: UserService) { }
+    private userService: UserService,
+    private changelogService: ChangelogService) { }
 
   async ngOnInit() {
     this.users = await this.userService.getUsers();
@@ -80,6 +82,7 @@ export class UserCrudComponent {
       );
 
       // REFRESH
+      this.changelogService.syncChangelogs().then(() => { console.log("Synced changelogs "); }).catch((err) => { console.error("Error syncing changelogs", err); });
       this.users = await this.userService.getUsers();
       this.editingUser = null;
     } else {
@@ -106,6 +109,7 @@ export class UserCrudComponent {
   async deleteUser(user: UserPublic) {
     await this.userService.deleteUser(user.id_usuario);
 
+    this.changelogService.syncChangelogs().then(() => { console.log("Synced changelogs "); }).catch((err) => { console.error("Error syncing changelogs", err); });
     this.users = await this.userService.getUsers();
   }
 

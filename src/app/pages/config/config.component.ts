@@ -6,7 +6,6 @@ import { AlertComponent } from '../../shared/components/ui/alert/alert.component
 import { CommonModule } from '@angular/common';
 import { UserCrudComponent } from '../../shared/components/user-crud/user-crud.component';
 import { ChangelogService } from '../../shared/services/changelog.service';
-import { ChangelogType } from '../../shared/enums/changelog-type';
 import { LoggeduserService } from '../../shared/services/loggeduser.service';
 
 @Component({
@@ -113,6 +112,8 @@ export class ConfigComponent {
         ramThreshold: this.ramThreshold,
         monitoringInterval: this.monitoringInterval
       }
+
+      this.changelogService.syncChangelogs().then(() => { console.log("Synced changelogs ");}).catch((err) => { console.error("Error syncing changelogs", err); });
 
       setInterval(() => {
         this.saveSuccess = false;
