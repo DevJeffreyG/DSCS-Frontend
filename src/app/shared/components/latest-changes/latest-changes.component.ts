@@ -4,7 +4,7 @@ import { Changelog } from '../../interfaces/changelog';
 import { ChangelogService } from '../../services/changelog.service';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../services/user.service';
-import { User, UserPublic } from '../../interfaces/user';
+import { UserPublic } from '../../interfaces/user';
 
 @Component({
   selector: 'app-latest-changes',
@@ -36,9 +36,16 @@ export class LatestChangesComponent implements OnInit, OnDestroy {
   }
 
   executor(changelog: Changelog): string {
+    let maxChar = 30;
     if (!changelog.id_usuario) return 'Sistema';
     
     const user = this.users.find(u => u.id_usuario === changelog.id_usuario);
-    return user ? user.nombre : 'Usuario desconocido';
+    let name = user ? user.nombre : 'Usuario desconocido';
+
+    if(name.length > maxChar) {
+      name = name.substring(0, maxChar - 3) + '...';
+    }
+
+    return name;
   }
 }

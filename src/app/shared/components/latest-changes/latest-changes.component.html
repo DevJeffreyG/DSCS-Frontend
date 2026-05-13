@@ -6,15 +6,36 @@
     } @else {
         <ul class="space-y-4">
             <li *ngFor="let changelog of changelogs" class="p-4 bg-white dark:bg-gray-800 dark:text-white rounded-lg shadow">
-                <p class="text-sm text-gray-600 mb-1">{{ changelog.fecha | date:'long' }}</p>
-                <p class="text-base text-gray-800 dark:text-white">[{{ executor(changelog) }}] {{ changelog.descripcion }}</p>
+                <div class="flex-row flex items-center gap-2 mb-5">
+                    <div class="text-sm text-gray-800 dark:text-white/90 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-0.5">
+                        👤 {{ executor(changelog) }}
+                    </div>
+                    <p class="text-base font-bold text-gray-800 dark:text-white">
+                        {{changelog.descripcion}}
+                    </p>
+                </div>
                 @if (changelog.old && changelog.new) {
-                    <p class="text-sm text-gray-500 mt-2">{{ changelog.old | json }} ➡️ {{ changelog.new | json }}</p>
+                    <div class="flex flex-row gap-2">
+                        <div class="text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-0.5">
+                            {{changelog.old | json}}
+                        </div>
+                        ➡️
+                        <div class="text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-0.5">
+                            {{changelog.new | json}}
+                        </div>
+                    </div>
                 }
 
                 @if (!changelog.old && changelog.new) {
-                    <p class="text-sm text-gray-500 mt-2">{{ changelog.new | json }}</p>
+                    <div class="flex flex-row gap-1">
+                        🆕
+                        <div class="text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-0.5">
+                            {{ changelog.new | json }}
+                        </div>
+                    </div>
                 }
+
+                <p class="text-xs text-gray-600 mt-2">{{ changelog.fecha | date:'long' }}</p>
             </li>
         </ul>
     }
