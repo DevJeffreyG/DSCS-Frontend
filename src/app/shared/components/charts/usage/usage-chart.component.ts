@@ -24,6 +24,7 @@ export class UsageChartComponent implements OnInit {
   @Input('server-id') serverId: number | undefined;
   name: string = 'CPU';
   message: string = 'Aquí puede ir un texto!';
+  lastUpdated: Date = new Date();
 
   lastThresholdIndex = 0;
 
@@ -121,6 +122,8 @@ export class UsageChartComponent implements OnInit {
             default:
               value = 0;
           }
+
+          this.lastUpdated = new Date();
 
           // Determina el índice de umbral actual
           let currentIndex = 0;

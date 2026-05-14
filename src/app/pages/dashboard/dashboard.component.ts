@@ -1,12 +1,13 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ComponentCardComponent } from '../../shared/components/common/component-card/component-card.component';
 import { CardNumberComponent } from '../../shared/components/cards/card-number/card-number.component';
 import { Server } from '../../shared/interfaces/server';
 import { ServerService } from '../../shared/services/server.service';
 import { ServerAlert } from '../../shared/interfaces/alert';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { LastEventsComponent } from '../../shared/components/tables/last-events/last-events.component';
+import { formatTimestamp } from '../../core/format';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +20,7 @@ import { LastEventsComponent } from '../../shared/components/tables/last-events/
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
   lastUpdate: Date = new Date();
   servers: Server[] = []
   cpuMean: number = 0;
@@ -27,10 +28,15 @@ export class DashboardComponent {
   recentAlertsCount: number = 0;
   private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
   private destroy$ = new Subject<void>();
+  private lastUpdatedSub?: Subscription;
 
   constructor(private serverService: ServerService) {}
 
   async ngOnInit() {
+    this.lastUpdatedSub = this.serverService.getLastUpdated().subscribe((timestamp) => {
+      this.lastUpdate = timestamp;
+    });
+
     await this.loadInitialData();
 
     this.refreshIntervalId = setInterval(() => {
@@ -42,6 +48,7 @@ export class DashboardComponent {
     if (this.refreshIntervalId) {
       clearInterval(this.refreshIntervalId);
     }
+    this.lastUpdatedSub?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -90,19 +97,6 @@ export class DashboardComponent {
   }
 
   formatTimestamp(date: Date | string): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffSecs < 60) return `Hace ${diffSecs} segundo${diffSecs === 1 ? '' : 's'}`;
-    if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins === 1 ? '' : 's'}`;
-    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours === 1 ? '' : 's'}`;
-    if (diffDays < 7) return `Hace ${diffDays} día${diffDays === 1 ? '' : 's'}`;
-
-    return d.toLocaleDateString();
+    return formatTimestamp(date);
   }
 }

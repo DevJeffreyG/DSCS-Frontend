@@ -18,7 +18,7 @@ export class ApiHelper {
 
         allUsers: `${ApiHelper.ROOT}/api/users`,
         userById: `${ApiHelper.ROOT}/api/users/:id`,
-        addUser: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
+        addUser: `${ApiHelper.ROOT}/api/users`, // Desarrolable
         deleteUser: `${ApiHelper.ROOT}/api/users/:id`,
         updateUser: `${ApiHelper.ROOT}/api/users/:id`,
 

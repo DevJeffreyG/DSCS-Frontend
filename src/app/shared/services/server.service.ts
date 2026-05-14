@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, firstValueFrom, take } from 'rxjs';
+import { Observable, firstValueFrom, take, BehaviorSubject } from 'rxjs';
 import { Server } from '../interfaces/server';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 
@@ -11,7 +11,17 @@ import { ApiHelper } from '../../core/apihelper';
   providedIn: 'root',
 })
 export class ServerService {
+  private lastUpdated$ = new BehaviorSubject<Date>(new Date());
+
   constructor(private alertManager: AlertManagerService, private http: HttpClient) { }
+
+  getLastUpdated(): Observable<Date> {
+    return this.lastUpdated$.asObservable();
+  }
+
+  private updateTimestamp(): void {
+    this.lastUpdated$.next(new Date());
+  }
 
   async getAllServers(): Promise<Server[]> {
     return new Promise((resolve, reject) => {
@@ -19,7 +29,6 @@ export class ServerService {
         .subscribe({
           next: (resp) => {
             try {
-              console.log(resp);
               resolve(resp);
             } catch (error) {
               console.error('❌ Error obteniendo servidores:', error);
@@ -45,7 +54,10 @@ export class ServerService {
     return new Promise((resolve) => {
       this.http.get<{ cpu: number; ram: number; disco: number; red: number; }>(ApiHelper.getEndpoint('getServerUsage', { serverid: serverId }))
         .subscribe({
-          next: (resp) => resolve(resp),
+          next: (resp) => {
+            this.updateTimestamp();
+            resolve(resp);
+          },
           error: (error) => {
             console.error(`❌ Error obteniendo uso del servidor ${serverId}:`, error);
             resolve({

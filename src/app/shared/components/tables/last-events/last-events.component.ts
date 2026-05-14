@@ -8,6 +8,7 @@ import { Server } from '../../../interfaces/server';
 import { ServerAlert } from '../../../interfaces/alert';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
+import { formatTimestamp } from '../../../../core/format';
 
 @Component({
   selector: 'app-last-events',
@@ -101,19 +102,7 @@ export class LastEventsComponent implements OnInit, OnDestroy {
   }
 
   formatTimestamp(date: Date | string): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Hace unos segundos';
-    if (diffMins < 60) return `Hace ${diffMins}m`;
-    if (diffHours < 24) return `Hace ${diffHours}h`;
-    if (diffDays < 7) return `Hace ${diffDays}d`;
-    
-    return d.toLocaleDateString();
+    return formatTimestamp(date)
   }
 
   resolveAlert(alertId: string): void {
