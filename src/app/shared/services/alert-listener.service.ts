@@ -1,10 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { map, shareReplay, take, tap } from 'rxjs/operators';
 import { io, Socket } from 'socket.io-client';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 import { ApiHelper } from '../../core/apihelper';
+import { Server } from '../interfaces/server';
 
 export interface ServerMetricsSnapshot {
   serverId: number;
@@ -25,6 +26,7 @@ export class AlertListenerService implements OnDestroy {
   private metricsSubject = new BehaviorSubject<ServerMetricsSnapshot[]>([]);
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
   private metricsCache = new Map<number, ServerMetricsSnapshot>();
+  private serverNameToId = new Map<string, number>();
 
   public alerts$ = this.alertSubject.asObservable().pipe(shareReplay(1));
   public metrics$ = this.metricsSubject.asObservable();
@@ -34,6 +36,48 @@ export class AlertListenerService implements OnDestroy {
 
   constructor(private http: HttpClient) {
     this.initializeWebSocket();
+    this.bootstrapMetricsCache();
+  }
+
+  private normalizeServerName(name: string): string {
+    return name.trim().toLowerCase();
+  }
+
+  private refreshServerNameIndex(servers: Server[]) {
+    this.serverNameToId.clear();
+
+    for (const server of servers) {
+      this.serverNameToId.set(this.normalizeServerName(server.nombre), server.id);
+    }
+  }
+
+  private bootstrapMetricsCache() {
+    this.http.get<Server[]>(ApiHelper.getEndpoint('allServers'))
+      .pipe(take(1))
+      .subscribe({
+        next: (servers) => {
+          this.refreshServerNameIndex(servers);
+
+          const now = new Date();
+
+          for (const server of servers) {
+            this.metricsCache.set(server.id, {
+              serverId: server.id,
+              nombre: server.nombre,
+              cpu: Number(server.cpu) || 0,
+              ram: Number(server.ram) || 0,
+              disco: Number(server.disco) || 0,
+              red: Number(server.red) || 0,
+              timestamp: now,
+            });
+          }
+
+          this.metricsSubject.next(Array.from(this.metricsCache.values()));
+        },
+        error: (error) => {
+          console.error('❌ Error cargando snapshot inicial de servidores:', error);
+        }
+      });
   }
 
   private initializeWebSocket() {
@@ -67,7 +111,15 @@ export class AlertListenerService implements OnDestroy {
     });
 
     this.socket.on('metrics_update', (metrics: Partial<ServerMetricsSnapshot> & { nodo?: string; nombre?: string }) => {
-      const serverId = Number(metrics.serverId);
+      const eventServerName = metrics.nombre || metrics.nodo || '';
+      let serverId = Number(metrics.serverId);
+
+      if (Number.isNaN(serverId) && eventServerName) {
+        const resolvedServerId = this.serverNameToId.get(this.normalizeServerName(eventServerName));
+        if (resolvedServerId !== undefined) {
+          serverId = resolvedServerId;
+        }
+      }
 
       if (Number.isNaN(serverId)) {
         return;
@@ -75,13 +127,17 @@ export class AlertListenerService implements OnDestroy {
 
       const snapshot: ServerMetricsSnapshot = {
         serverId,
-        nombre: metrics.nombre || metrics.nodo || `#${serverId}`,
+        nombre: eventServerName || `#${serverId}`,
         cpu: Number(metrics.cpu) || 0,
         ram: Number(metrics.ram) || 0,
         disco: Number(metrics.disco) || 0,
         red: Number(metrics.red) || 0,
         timestamp: new Date(metrics.timestamp || Date.now()),
       };
+
+      if (snapshot.nombre) {
+        this.serverNameToId.set(this.normalizeServerName(snapshot.nombre), serverId);
+      }
 
       this.metricsCache.set(serverId, snapshot);
       this.metricsSubject.next(Array.from(this.metricsCache.values()));
