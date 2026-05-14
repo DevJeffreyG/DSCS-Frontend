@@ -6,15 +6,28 @@ import { io, Socket } from 'socket.io-client';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
 import { ApiHelper } from '../../core/apihelper';
 
+export interface ServerMetricsSnapshot {
+  serverId: number;
+  nombre: string;
+  cpu: number;
+  ram: number;
+  disco: number;
+  red: number;
+  timestamp: Date;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AlertListenerService implements OnDestroy {
   private socket: Socket | null = null;
   private alertSubject = new Subject<ServerAlert>();
+  private metricsSubject = new BehaviorSubject<ServerMetricsSnapshot[]>([]);
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+  private metricsCache = new Map<number, ServerMetricsSnapshot>();
 
   public alerts$ = this.alertSubject.asObservable().pipe(shareReplay(1));
+  public metrics$ = this.metricsSubject.asObservable();
   public connected$ = this.connectionStatusSubject.asObservable();
 
   private serverListeners = new Map<number, Subject<ServerAlert>>();
@@ -51,6 +64,27 @@ export class AlertListenerService implements OnDestroy {
       if (this.serverListeners.has(alert.serverId)) {
         this.serverListeners.get(alert.serverId)?.next(alert);
       }
+    });
+
+    this.socket.on('metrics_update', (metrics: Partial<ServerMetricsSnapshot> & { nodo?: string; nombre?: string }) => {
+      const serverId = Number(metrics.serverId);
+
+      if (Number.isNaN(serverId)) {
+        return;
+      }
+
+      const snapshot: ServerMetricsSnapshot = {
+        serverId,
+        nombre: metrics.nombre || metrics.nodo || `#${serverId}`,
+        cpu: Number(metrics.cpu) || 0,
+        ram: Number(metrics.ram) || 0,
+        disco: Number(metrics.disco) || 0,
+        red: Number(metrics.red) || 0,
+        timestamp: new Date(metrics.timestamp || Date.now()),
+      };
+
+      this.metricsCache.set(serverId, snapshot);
+      this.metricsSubject.next(Array.from(this.metricsCache.values()));
     });
 
     this.socket.on('error', (error: any) => {

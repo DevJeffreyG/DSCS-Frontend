@@ -5,8 +5,8 @@ import { UsageChartComponent } from '../../shared/components/charts/usage/usage-
 import { MonitorType } from '../../shared/enums/monitor-type';
 import { LastEventsComponent } from '../../shared/components/tables/last-events/last-events.component';
 import { CommonModule } from '@angular/common';
-import { ServerService } from '../../shared/services/server.service';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { AlertListenerService, ServerMetricsSnapshot } from '../../shared/services/alert-listener.service';
 import { formatTimestamp } from '../../core/format';
 
 @Component({
@@ -22,11 +22,11 @@ export class MonitorComponent implements OnInit, OnDestroy {
   server: Server | null;
   lastUpdated: Date = new Date();
   MonitorType = MonitorType;
-  private lastUpdatedSub?: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(
     router: Router,
-    private serverService: ServerService
+    private alertListener: AlertListenerService
   ){
     if(router.currentNavigation()?.extras.state) {
       const server = router.currentNavigation()?.extras.state?.['server'];   
@@ -38,15 +38,24 @@ export class MonitorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.lastUpdatedSub = this.serverService.getLastUpdated().subscribe(
-      timestamp => {
-        this.lastUpdated = timestamp;
-      }
-    );
+    if (!this.server) {
+      return;
+    }
+
+    this.alertListener.metrics$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((metrics: ServerMetricsSnapshot[]) => {
+        const currentServer = metrics.find((metric) => metric.serverId === this.server?.id);
+
+        if (currentServer) {
+          this.lastUpdated = currentServer.timestamp;
+        }
+      });
   }
 
   ngOnDestroy(): void {
-    this.lastUpdatedSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   formatTimestamp(date: Date | string): string {

@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { BadgeComponent } from '../../ui/badge/badge.component';
 import { AlertManagerService } from '../../../services/alert-manager.service';
 import { ServerService } from '../../../services/server.service';
-import { Server } from '../../../interfaces/server';
 import { ServerAlert } from '../../../interfaces/alert';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { formatTimestamp } from '../../../../core/format';
+import { AlertListenerService, ServerMetricsSnapshot } from '../../../services/alert-listener.service';
 
 @Component({
   selector: 'app-last-events',
@@ -28,36 +28,38 @@ export class LastEventsComponent implements OnInit, OnDestroy {
     serverMap: Record<number, string> = {}; // id -> nombre
     isLoading: boolean = true;
     private destroy$ = new Subject<void>();
+    private knownServerIds = new Set<number>();
 
     constructor(
       private alertManager: AlertManagerService,
-      private serverService: ServerService
+      private serverService: ServerService,
+      private alertListener: AlertListenerService
     ) {}
 
     ngOnInit() {
       console.log(`🔍 LastEventsComponent iniciado for serverId=${this.serverId} allServers=${this.allServers}`);
 
       if (this.allServers) {
-        // Cargar lista de servidores y precargar sus alertas históricas
-        this.serverService.getAllServers().then(async (servers: Server[]) => {
-          servers.forEach(s => (this.serverMap[s.id] = s.nombre));
-          try {
-            await this.serverService.preloadServerAlerts(servers);
-          } catch (err) {
-            console.error('❌ Error pre-cargando alertas de servidores:', err);
-          }
-
-          // Suscribirse al mapa global de alertas y combinar todas las alertas
-          this.alertManager.activeAlerts$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((cache) => {
-              const allAlerts = Array.from(cache.values()).flat();
-              this.alerts = allAlerts
-                .sort((a: ServerAlert, b: ServerAlert) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-              this.isLoading = false;
-              console.log(`✅ Mostrando ${this.alerts.length} alertas (todos los servidores)`);
+        this.alertListener.metrics$
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((metrics: ServerMetricsSnapshot[]) => {
+            metrics.forEach((metric) => {
+              this.serverMap[metric.serverId] = metric.nombre;
             });
-        });
+
+            void this.preloadAlertsForKnownServers(metrics);
+          });
+
+        // Suscribirse al mapa global de alertas y combinar todas las alertas
+        this.alertManager.activeAlerts$
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((cache) => {
+            const allAlerts = Array.from(cache.values()).flat();
+            this.alerts = allAlerts
+              .sort((a: ServerAlert, b: ServerAlert) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            this.isLoading = false;
+            console.log(`✅ Mostrando ${this.alerts.length} alertas (todos los servidores)`);
+          });
       } else {
         console.log(`🔍 LastEventsComponent iniciado para servidor ${this.serverId}`);
         // Obtener alertas del servidor
@@ -81,6 +83,23 @@ export class LastEventsComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
       this.destroy$.next();
       this.destroy$.complete();
+    }
+
+    private async preloadAlertsForKnownServers(metrics: ServerMetricsSnapshot[]) {
+      const newServerIds = metrics
+        .map((metric) => metric.serverId)
+        .filter((serverId) => {
+          if (this.knownServerIds.has(serverId)) {
+            return false;
+          }
+
+          this.knownServerIds.add(serverId);
+          return true;
+        });
+
+      if (newServerIds.length > 0) {
+        await this.serverService.preloadServerAlertsByIds(newServerIds);
+      }
     }
 
     getBadgeColor(tipo: string): 'success' | 'warning' | 'error' {

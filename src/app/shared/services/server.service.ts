@@ -90,6 +90,18 @@ export class ServerService {
     );
   }
 
+  async preloadServerAlertsByIds(serverIds: number[]): Promise<void> {
+    await Promise.all(
+      serverIds.map(async (serverId) => {
+        try {
+          await firstValueFrom(this.getServerAlerts(serverId).pipe(take(1)));
+        } catch (error) {
+          console.error(`❌ Error cargando alertas del servidor ${serverId}:`, error);
+        }
+      })
+    );
+  }
+
   /**
    * Obtener alertas históricas desde el backend con filtros
    */

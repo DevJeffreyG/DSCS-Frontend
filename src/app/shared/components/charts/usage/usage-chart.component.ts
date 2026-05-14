@@ -1,16 +1,16 @@
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import {
   ApexNonAxisChartSeries,
   ApexChart,
   ApexPlotOptions,
   ApexFill,
   ApexStroke,
-  ApexOptions,
   NgApexchartsModule,
 } from 'ng-apexcharts';
+import { Subject, takeUntil } from 'rxjs';
 import { MonitorType } from '../../../enums/monitor-type';
-import { ServerService } from '../../../services/server.service';
+import { AlertListenerService, ServerMetricsSnapshot } from '../../../services/alert-listener.service';
 
 @Component({
   selector: 'app-usage-chart',
@@ -19,7 +19,7 @@ import { ServerService } from '../../../services/server.service';
   ],
   templateUrl: './usage-chart.component.html',
 })
-export class UsageChartComponent implements OnInit {
+export class UsageChartComponent implements OnInit, OnDestroy {
   @Input('usage-type') usageType: MonitorType = MonitorType.CPU;
   @Input('server-id') serverId: number | undefined;
   name: string = 'CPU';
@@ -76,8 +76,9 @@ export class UsageChartComponent implements OnInit {
   };
   public labels: string[] = ['Progress'];
   public colors: string[] = ['#465FFF'];
+  private destroy$ = new Subject<void>();
 
-  constructor(private serverService: ServerService) { }
+  constructor(private alertListener: AlertListenerService) { }
 
   async ngOnInit() {
     switch (this.usageType) {
@@ -102,57 +103,75 @@ export class UsageChartComponent implements OnInit {
         this.message = 'Monitor de recurso.';
     }
 
-    setInterval(() => {
-      if (this.serverId)
-        this.serverService.getServerUsage(this.serverId).then(usage => {
-          let value = 0;
-          switch (this.usageType) {
-            case MonitorType.CPU:
-              value = usage.cpu;
-              break;
-            case MonitorType.RAM:
-              value = usage.ram;
-              break;
-            case MonitorType.DISK:
-              value = usage.disco;
-              break;
-            case MonitorType.NET:
-              value = usage.red;
-              break;
-            default:
-              value = 0;
-          }
+    this.alertListener.metrics$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((metrics: ServerMetricsSnapshot[]) => {
+        if (!this.serverId) {
+          return;
+        }
 
-          this.lastUpdated = new Date();
+        const currentServer = metrics.find((metric) => metric.serverId === this.serverId);
 
-          // Determina el índice de umbral actual
-          let currentIndex = 0;
-          for (let i = this.thresholds.length - 1; i >= 0; i--) {
-            if (value >= this.thresholds[i].value) {
-              currentIndex = i;
-              break;
-            }
-          }
-          // Solo actualiza el color si el índice cambió, sin tocar la serie
-          if (currentIndex !== this.lastThresholdIndex) {
-            const threshold = this.thresholds[currentIndex];
-            // Asegura que los arrays existan antes de asignar
-            if (Array.isArray(this.fill.colors) && this.fill.colors.length > 0) {
-              this.fill.colors[0] = threshold.color;
-            } else {
-              this.fill.colors = [threshold.color];
-            }
-            if (Array.isArray(this.colors) && this.colors.length > 0) {
-              this.colors[0] = threshold.color;
-            } else {
-              this.colors = [threshold.color];
-            }
-            this.lastThresholdIndex = currentIndex;
-          }
+        if (!currentServer) {
+          return;
+        }
 
-          this.changePercentage(value);
-        });
-    }, 1000); // Update every second
+        const value = this.getMetricValue(currentServer);
+        this.lastUpdated = currentServer.timestamp;
+        this.updateThresholdColor(value);
+        this.changePercentage(value);
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private getMetricValue(server: ServerMetricsSnapshot): number {
+    switch (this.usageType) {
+      case MonitorType.CPU:
+        return server.cpu;
+      case MonitorType.RAM:
+        return server.ram;
+      case MonitorType.DISK:
+        return server.disco;
+      case MonitorType.NET:
+        return server.red;
+      default:
+        return 0;
+    }
+  }
+
+  private updateThresholdColor(value: number) {
+    let currentIndex = 0;
+
+    for (let i = this.thresholds.length - 1; i >= 0; i--) {
+      if (value >= this.thresholds[i].value) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    if (currentIndex === this.lastThresholdIndex) {
+      return;
+    }
+
+    const threshold = this.thresholds[currentIndex];
+
+    if (Array.isArray(this.fill.colors) && this.fill.colors.length > 0) {
+      this.fill.colors[0] = threshold.color;
+    } else {
+      this.fill.colors = [threshold.color];
+    }
+
+    if (Array.isArray(this.colors) && this.colors.length > 0) {
+      this.colors[0] = threshold.color;
+    } else {
+      this.colors = [threshold.color];
+    }
+
+    this.lastThresholdIndex = currentIndex;
   }
 
   changePercentage(newValue: number) {

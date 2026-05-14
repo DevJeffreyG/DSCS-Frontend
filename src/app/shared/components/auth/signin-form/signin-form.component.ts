@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { LabelComponent } from '../../form/label/label.component';
-import { CheckboxComponent } from '../../form/input/checkbox.component';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { InputFieldComponent } from '../../form/input/input-field.component';
 
@@ -18,7 +17,6 @@ import { AuthService } from '../../../services/auth.service';
 
   imports: [
     LabelComponent,
-    CheckboxComponent,
     ButtonComponent,
     InputFieldComponent,
     RouterModule,

@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 
 import { ServerService } from '../../shared/services/server.service';
 import { Server } from '../../shared/interfaces/server';
+import { AlertListenerService, ServerMetricsSnapshot } from '../../shared/services/alert-listener.service';
 
 import { LoggeduserService } from '../../shared/services/loggeduser.service';
 import { UserRole } from '../../shared/enums/user-role';
+import { formatTimestamp } from '../../core/format';
 
 @Component({
   selector: 'app-servers',
@@ -19,9 +22,10 @@ import { UserRole } from '../../shared/enums/user-role';
   templateUrl: './servers.component.html',
 })
 
-export class ServersComponent {
+export class ServersComponent implements OnInit, OnDestroy {
 
   servers: Server[] = [];
+  lastUpdate: Date = new Date();
 
   showForm = false;
 
@@ -35,15 +39,41 @@ export class ServersComponent {
     estado: 'Online'
   };
 
+  private destroy$ = new Subject<void>();
+  private knownServerIds = new Set<number>();
+
   constructor(
     private router: Router,
-    private serverService: ServerService
+    private serverService: ServerService,
+    private alertListener: AlertListenerService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.alertListener.metrics$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((metrics: ServerMetricsSnapshot[]) => {
+        this.servers = metrics.map((metric) => ({
+          id: metric.serverId,
+          nombre: metric.nombre,
+          ip: 'auto-discovered',
+          estado: 'Online',
+          cpu: metric.cpu,
+          ram: metric.ram,
+          disco: metric.disco,
+          red: metric.red,
+        }));
 
-    // CARGAR SERVIDORES
-    this.servers = await this.serverService.getAllServers();
+        if (metrics.length > 0) {
+          const latestTimestamp = metrics.reduce((latest, metric) => {
+            const metricTimestamp = new Date(metric.timestamp).getTime();
+            return metricTimestamp > latest ? metricTimestamp : latest;
+          }, 0);
+
+          this.lastUpdate = new Date(latestTimestamp);
+        }
+
+        this.knownServerIds = new Set(metrics.map((metric) => metric.serverId));
+      });
 
     // OBTENER USUARIO LOGUEADO
     const user = LoggeduserService.getUser();
@@ -52,6 +82,11 @@ export class ServersComponent {
       this.currentUserRole =user.rol;
     }
 
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   
@@ -98,8 +133,13 @@ export class ServersComponent {
     // GUARDAR
     await this.serverService.addServer(server);
 
-    // ACTUALIZAR
-    this.servers = await this.serverService.getAllServers();
+    // ACTUALIZAR EN MEMORIA HASTA QUE LLEGUE EL PRIMER EVENTO DEL WS
+    if (!this.knownServerIds.has(server.id)) {
+      this.servers = [server, ...this.servers];
+      this.knownServerIds.add(server.id);
+    }
+
+    this.lastUpdate = new Date();
 
     // LIMPIAR
     this.newServer = {
@@ -111,6 +151,10 @@ export class ServersComponent {
     // CERRAR FORM
     this.showForm = false;
 
+  }
+
+  formatTimestamp(date: Date | string): string {
+    return formatTimestamp(date);
   }
 
 }

@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ComponentCardComponent } from '../../shared/components/common/component-card/component-card.component';
 import { CardNumberComponent } from '../../shared/components/cards/card-number/card-number.component';
-import { Server } from '../../shared/interfaces/server';
 import { ServerService } from '../../shared/services/server.service';
 import { ServerAlert } from '../../shared/interfaces/alert';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { LastEventsComponent } from '../../shared/components/tables/last-events/last-events.component';
 import { formatTimestamp } from '../../core/format';
+import { AlertListenerService, ServerMetricsSnapshot } from '../../shared/services/alert-listener.service';
+
+interface DashboardServerMetric extends ServerMetricsSnapshot {}
 
 @Component({
   selector: 'app-dashboard',
@@ -22,53 +24,55 @@ import { formatTimestamp } from '../../core/format';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   lastUpdate: Date = new Date();
-  servers: Server[] = []
+  servers: DashboardServerMetric[] = []
   cpuMean: number = 0;
   ramMean: number = 0;
   recentAlertsCount: number = 0;
-  private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
   private destroy$ = new Subject<void>();
-  private lastUpdatedSub?: Subscription;
+  private knownServerIds = new Set<number>();
 
-  constructor(private serverService: ServerService) {}
+  constructor(
+    private serverService: ServerService,
+    private alertListener: AlertListenerService
+  ) {}
 
   async ngOnInit() {
-    this.lastUpdatedSub = this.serverService.getLastUpdated().subscribe((timestamp) => {
-      this.lastUpdate = timestamp;
-    });
-
-    await this.loadInitialData();
-
-    this.refreshIntervalId = setInterval(() => {
-      void this.refreshAverageMetrics();
-    }, 30000);
-  }
-
-  ngOnDestroy() {
-    if (this.refreshIntervalId) {
-      clearInterval(this.refreshIntervalId);
-    }
-    this.lastUpdatedSub?.unsubscribe();
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private async loadInitialData() {
-    this.servers = await this.serverService.getAllServers();
-    await this.serverService.preloadServerAlerts(this.servers);
+    this.alertListener.metrics$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((servers) => {
+        this.servers = servers;
+        this.lastUpdate = servers[0]?.timestamp ?? new Date();
+        this.calculateMeans();
+        void this.preloadAlertsForKnownServers(servers);
+      });
 
     this.serverService.getAllCriticalAlerts()
       .pipe(takeUntil(this.destroy$))
       .subscribe((alerts) => {
         this.updateRecentAlertsCount(alerts);
       });
-
-    this.calculateMeans();
   }
 
-  private async refreshAverageMetrics() {
-    this.servers = await this.serverService.getAllServers();
-    this.calculateMeans();
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private async preloadAlertsForKnownServers(servers: DashboardServerMetric[]) {
+    const newServerIds = servers
+      .map((server) => server.serverId)
+      .filter((serverId) => {
+        if (this.knownServerIds.has(serverId)) {
+          return false;
+        }
+
+        this.knownServerIds.add(serverId);
+        return true;
+      });
+
+    if (newServerIds.length > 0) {
+      await this.serverService.preloadServerAlertsByIds(newServerIds);
+    }
   }
 
   private updateRecentAlertsCount(alerts: ServerAlert[]) {
