@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, firstValueFrom, take } from 'rxjs';
 import { Server } from '../interfaces/server';
 import { ServerAlert, AlertFilter, AlertStats } from '../interfaces/alert';
@@ -10,12 +10,10 @@ import { ApiHelper } from '../../core/apihelper';
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService implements OnDestroy {
-
+export class ServerService {
   constructor(private alertManager: AlertManagerService, private http: HttpClient) { }
 
   async getAllServers(): Promise<Server[]> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
       this.http.get<Server[]>(ApiHelper.getEndpoint('allServers'))
         .subscribe({
@@ -34,7 +32,6 @@ export class ServerService implements OnDestroy {
   }
 
   async addServer(server: Server): Promise<void> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
       this.http.post<void>(ApiHelper.getEndpoint('addServer'), server)
         .subscribe({
@@ -131,53 +128,4 @@ export class ServerService implements OnDestroy {
   clearServerAlerts(serverId: number): void {
     this.alertManager.clearAllAlerts(serverId);
   }
-
-  private dummyServers: Server[] = [
-
-    {
-      id: 1,
-      nombre: 'Servidor Principal',
-      ip: '192.168.1.10',
-      estado: 'Online',
-      cpu: 35,
-      ram: 62,
-      disco: 48,
-      red: 88
-    },
-
-    {
-      id: 2,
-      nombre: 'Base de Datos',
-      ip: '192.168.1.20',
-      estado: 'Online',
-      cpu: 75,
-      ram: 80,
-      disco: 65,
-      red: 50
-    },
-
-    {
-      id: 3,
-      nombre: 'Servidor Web',
-      ip: '192.168.1.30',
-      estado: 'Offline',
-      cpu: 0,
-      ram: 0,
-      disco: 20,
-      red: 0
-    }
-
-  ];
-
-
-  ngOnDestroy() {
-
-    this.dummyServers.forEach(server => {
-
-      this.unsubscribeFromServerAlerts(server.id);
-
-    });
-
-  }
-
 }

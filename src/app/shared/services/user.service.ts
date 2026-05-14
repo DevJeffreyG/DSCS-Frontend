@@ -15,7 +15,6 @@ export class UserService {
   // GET USERS
   // =====================================
   async getUsers(): Promise<UserPublic[]> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
       this.http.get<UserPublic[]>(ApiHelper.getEndpoint('allUsers'), ApiHelper.AuthorizedHeaders())
         .subscribe({
@@ -27,8 +26,7 @@ export class UserService {
     });
   }
 
-  async addUser(user: User  ): Promise<void> {
-    // TODO: API CALL
+  /* async addUser(user: User  ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(ApiHelper.getEndpoint('addUser'), user, ApiHelper.AuthorizedHeaders())
         .subscribe({
@@ -39,11 +37,10 @@ export class UserService {
         });
     });
   }
-
+ */
   async getUserById(id: number): Promise<UserPublic | undefined> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
-      this.http.get<UserPublic>(ApiHelper.getEndpoint('userById', { userid: id }), ApiHelper.AuthorizedHeaders())
+      this.http.get<UserPublic>(ApiHelper.getEndpoint('userById', { id: id }), ApiHelper.AuthorizedHeaders())
         .subscribe({
           next: (resp) => {
             resolve(resp);
@@ -54,9 +51,8 @@ export class UserService {
   }
 
   async updateUser(id: number, updatedUser: User): Promise<void> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
-      this.http.put<void>(ApiHelper.getEndpoint('updateUser', { userid: id }), updatedUser, ApiHelper.AuthorizedHeaders())
+      this.http.put<void>(ApiHelper.getEndpoint('updateUser', { id: id }), updatedUser, ApiHelper.AuthorizedHeaders())
         .subscribe({
           next: () => {
             resolve();
@@ -69,9 +65,8 @@ export class UserService {
   async deleteUser(
     id: number
   ): Promise<void> {
-    // TODO: API CALL
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(ApiHelper.getEndpoint('deleteUser', { userid: id }), ApiHelper.AuthorizedHeaders())
+      this.http.delete<void>(ApiHelper.getEndpoint('deleteUser', { id: id }), ApiHelper.AuthorizedHeaders())
         .subscribe({
           next: () => {
             resolve();
@@ -80,24 +75,4 @@ export class UserService {
         });
     });
   }
-
-  private dummyUsers: User[] = [
-
-    {
-      id_usuario: 1,
-      nombre: 'Admin User',
-      correo: 'admin@example.com',
-      contraseña: 'admin123',
-      rol: UserRole.Admin,
-    },
-
-    {
-      id_usuario: 2,
-      nombre: 'Operator User',
-      correo: 'operator@example.com',
-      contraseña: 'operator123',
-      rol: UserRole.Operator,
-    }
-  ];
-
 }

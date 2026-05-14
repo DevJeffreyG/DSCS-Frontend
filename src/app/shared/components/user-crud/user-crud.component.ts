@@ -86,7 +86,7 @@ export class UserCrudComponent {
       this.users = await this.userService.getUsers();
       this.editingUser = null;
     } else {
-      const newUser: User = {
+      /* const newUser: User = {
         id_usuario: Date.now(),
         nombre: this.userName,
         correo: this.userEmail,
@@ -95,7 +95,7 @@ export class UserCrudComponent {
       };
 
       await this.userService.addUser(newUser);
-      this.users = await this.userService.getUsers();
+      this.users = await this.userService.getUsers(); */
     }
 
     this.userName = '';

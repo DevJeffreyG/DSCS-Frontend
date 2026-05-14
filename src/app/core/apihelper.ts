@@ -17,10 +17,10 @@ export class ApiHelper {
         saveConfig: `${ApiHelper.ROOT}/api/config`,
 
         allUsers: `${ApiHelper.ROOT}/api/users`,
-        userById: `${ApiHelper.ROOT}/api/users/:userid`,
+        userById: `${ApiHelper.ROOT}/api/users/:id`,
         addUser: `${ApiHelper.ROOT}/api/users`, // TODO: FALTA
-        deleteUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
-        updateUser: `${ApiHelper.ROOT}/api/users/:userid`, // TODO: FALTA
+        deleteUser: `${ApiHelper.ROOT}/api/users/:id`,
+        updateUser: `${ApiHelper.ROOT}/api/users/:id`,
 
         auth: `${ApiHelper.ROOT}/api/auth/login`,
         validateToken: `${ApiHelper.ROOT}/api/auth/me` 
